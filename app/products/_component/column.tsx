@@ -14,106 +14,59 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Badge } from "@/components/ui/badge";
+import { CellAction } from "./cell-action";
 
-export const columns: ColumnDef<Product>[] = [
+export type ProductColumn = {
+  id: number;
+  name: string;
+  status: string;
+  amount: number;
+  category: {
+    name: string;
+  };
+};
+
+export const columns: ColumnDef<ProductColumn>[] = [
   {
     accessorKey: "name",
     header: "Name",
   },
   {
+    accessorKey: "description",
+    header: "Description",
+    cell: ({ row }) => {
+      const description = row.getValue("description");
+
+      return (
+        <div className="truncate w-56 text-muted-foreground">
+          {description as React.ReactNode}
+        </div>
+      );
+    },
+  },
+  {
     accessorKey: "status",
     header: "Status",
-  },
-  {
-    accessorKey: "price",
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Price
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      );
-    },
     cell: ({ row }) => {
-      const amount = parseFloat(row.getValue("price"));
-      const formatted = new Intl.NumberFormat("en-US", {
-        style: "currency",
-        currency: "USD",
-      }).format(amount);
+      const status = row.getValue("status");
 
-      return <div className="ml-5">{formatted}</div>;
+      return <Badge variant={"outline"}>{status as React.ReactNode}</Badge>;
     },
   },
   {
-    accessorKey: "totalSales",
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Total Sales
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      );
-    },
-    cell: ({ row }) => {
-      const amount = parseFloat(row.getValue("totalSales"));
-      const formatted = new Intl.NumberFormat("en-US", {
-        style: "currency",
-        currency: "USD",
-      }).format(amount);
-
-      return <div className="ml-5">{formatted}</div>;
-    },
+    accessorKey: "category.name",
+    header: "Category",
   },
   {
-    accessorKey: "createdAt",
-    header: "Created At",
-    cell: ({ row }) => {
-      const date = new Date(row.getValue("createdAt"));
-      const formatted = new Intl.DateTimeFormat("en-US").format(date);
-
-      return <div className="">{formatted}</div>;
-    },
+    accessorKey: "amount",
+    header: "Amount",
   },
   {
     id: "actions",
     header: "Actions",
     cell: ({ row }) => {
-      const payment = row.original;
-
-      return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem>Copy product ID</DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>
-              {" "}
-              <Eye className="w-4 h-4 mr-3" />
-              View
-            </DropdownMenuItem>
-            <DropdownMenuItem>
-              <Edit className="w-4 h-4 mr-3" />
-              Edit
-            </DropdownMenuItem>
-            <DropdownMenuItem>
-              <Trash className="w-4 h-4 mr-3" />
-              Delete
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      );
+      return <CellAction data={row.original} />;
     },
   },
 ];

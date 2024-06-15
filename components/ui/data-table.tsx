@@ -8,6 +8,7 @@ import {
   useReactTable,
   getPaginationRowModel,
   getSortedRowModel,
+  getFilteredRowModel,
   SortingState,
 } from "@tanstack/react-table";
 import {
@@ -32,17 +33,23 @@ import {
   DoubleArrowLeftIcon,
   DoubleArrowRightIcon,
 } from "@radix-ui/react-icons";
+import { Input } from "./input";
+import { Search } from "lucide-react";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
+  loading?: boolean;
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
+  loading = true,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
+  const [search, setSearch] = React.useState<string>("");
+
   const table = useReactTable({
     data,
     columns,
@@ -50,13 +57,26 @@ export function DataTable<TData, TValue>({
     getPaginationRowModel: getPaginationRowModel(),
     onSortingChange: setSorting,
     getSortedRowModel: getSortedRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
     state: {
       sorting,
+      globalFilter: search,
     },
+    onGlobalFilterChange: setSearch,
   });
 
   return (
     <div>
+      <div className="relative mb-5">
+        <Search className="absolute left-2.5 top-3 h-4 w-4 text-muted-foreground" />
+        <Input
+          type="search"
+          placeholder="Search..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="w-full h-10 rounded-lg bg-background pl-8 md:w-[200px] lg:w-[336px]"
+        />
+      </div>
       <div className="rounded-md border">
         <Table>
           <TableHeader>
@@ -64,12 +84,12 @@ export function DataTable<TData, TValue>({
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => {
                   return (
-                    <TableHead key={header.id}>
+                    <TableHead key={header.id} className="text-foreground">
                       {header.isPlaceholder
                         ? null
                         : flexRender(
                             header.column.columnDef.header,
-                            header.getContext()
+                            header.getContext(),
                           )}
                     </TableHead>
                   );
@@ -88,12 +108,22 @@ export function DataTable<TData, TValue>({
                     <TableCell key={cell.id}>
                       {flexRender(
                         cell.column.columnDef.cell,
-                        cell.getContext()
+                        cell.getContext(),
                       )}
                     </TableCell>
                   ))}
                 </TableRow>
               ))
+            ) : loading ? (
+              <>
+                {Array.from({ length: columns.length }).map((_, index) => (
+                  <TableRow key={index}>
+                    <TableCell colSpan={columns.length} className="w-full ">
+                      <div className="h-8 bg-gray-100 p-2"></div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </>
             ) : (
               <TableRow>
                 <TableCell
@@ -120,7 +150,7 @@ export function DataTable<TData, TValue>({
             {Math.min(
               (table.getState().pagination.pageIndex + 1) *
                 table.getState().pagination.pageSize,
-              table.getFilteredRowModel().rows.length
+              table.getFilteredRowModel().rows.length,
             )}
           </strong>{" "}
           of <strong>{table.getFilteredRowModel().rows.length}</strong> products
