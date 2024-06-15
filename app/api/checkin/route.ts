@@ -41,6 +41,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ attendance: type, employee });
   } catch (error) {
     console.error("Error Checkin", error);
-    return NextResponse.error("Error checking in");
+    return NextResponse.error();
   }
 }
