@@ -50,7 +50,10 @@ export async function POST(req: any) {
   }
 }
 
-export async function DELETE(req, { params }: { params: { id: string } }) {
+export async function DELETE(
+  req: Request,
+  { params }: { params: { id: string } },
+) {
   console.log("dwadwadwadwa", params.id);
 
   return new NextResponse("Employee deleted", { status: 200 });

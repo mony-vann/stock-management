@@ -58,7 +58,7 @@ const AddNewStaff = ({ onAdd }: { onAdd: () => void }) => {
 
   const [pending, setPending] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [shifts, setShifts] = useState();
+  const [shifts, setShifts] = useState([]);
 
   const fetchShifts = async () => {
     try {
