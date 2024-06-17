@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import {
   Card,
   CardContent,
@@ -19,7 +19,7 @@ interface StaffClientProps {
 
 const StaffClient: React.FC<StaffClientProps> = ({ data }) => {
   return (
-    <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8">
+    <main className="grid flex-1 items-start gap-4 p-4  md:px-6 sm:py-0 md:gap-8">
       <div className="flex items-center">
         <div className="ml-auto flex items-center gap-2">
           <Button size="sm" variant="outline" className="gap-1">

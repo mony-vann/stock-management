@@ -67,7 +67,7 @@ export function DataTable<TData, TValue>({
   });
 
   return (
-    <div>
+    <div className="w-[330px] md:w-full">
       <div className="relative mb-5">
         <Search className="absolute left-2.5 top-3 h-4 w-4 text-muted-foreground" />
         <Input

@@ -16,6 +16,7 @@ const StaffPage = async () => {
       id: item.id,
       name: item.name,
       contact_info: item.contact_info,
+      role: item.role,
       shifts: item.shifts,
     };
   });

@@ -10,15 +10,32 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
+  DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import EditStaff from "./editStaff";
-import { StaffColumn } from "./column";
-import { DropdownMenuTrigger } from "@radix-ui/react-dropdown-menu";
 import { Button } from "@/components/ui/button";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+
 import { useToast } from "@/components/ui/use-toast";
 
 interface CellActionProps {
-  data: StaffColumn;
+  data: {
+    id: number;
+    name: string;
+    contact_info: string | null;
+    role: string;
+    shifts: { id: number; name: string; start_time: Date; end_time: Date }[];
+  };
 }
 
 export const CellAction: React.FC<CellActionProps> = ({ data }) => {
@@ -26,6 +43,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
   const { toast } = useToast();
 
   const onDelete = async (id: number) => {
+    console.log("id", id);
     try {
       await axios.delete(`/api/employee?id=${id}`);
       toast({
@@ -49,7 +67,6 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           <DropdownMenuLabel>Actions</DropdownMenuLabel>
-          <DropdownMenuItem>Copy product ID</DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem onClick={() => router.push(`products/${data.id}`)}>
             <Eye className="w-4 h-4 mr-3" />
@@ -62,9 +79,35 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
           >
             <EditStaff data={data} />
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => onDelete(data.id)}>
-            <Trash className="w-4 h-4 mr-3" />
-            Delete
+          <DropdownMenuItem
+            onSelect={(e) => {
+              e.preventDefault();
+            }}
+          >
+            <AlertDialog>
+              <AlertDialogTrigger className="flex items-center">
+                <Trash className="w-4 h-4 mr-3" />
+                Delete
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This action cannot be undone. All attendance records will be
+                    deleted and cannot be recoverd.{" "}
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction
+                    className="bg-red-600"
+                    onClick={() => onDelete(data.id)}
+                  >
+                    Delete
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
