@@ -7,7 +7,7 @@ import { CellAction } from "./cell-action";
 export type StaffColumn = {
   id: number;
   name: string;
-  phone: string;
+  contact_info: string | null;
   shifts: Object[];
 };
 

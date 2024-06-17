@@ -15,7 +15,6 @@ import {
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -27,10 +26,17 @@ import {
   CardTitle,
   CardDescription,
   CardHeader,
-  CardFooter,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, LoaderCircle } from "lucide-react";
+
+interface Employee {
+  id: number;
+  name: string;
+  role: string;
+  shift: string;
+  contact_info: string;
+}
 
 const FormSchema = z.object({
   pin: z.string().min(4, {
@@ -50,7 +56,7 @@ const CheckinPage = () => {
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
   const [type, setType] = useState("");
-  const [employee, setEmployee] = useState({});
+  const [employee, setEmployee] = useState<Employee>();
   const submitRef = useRef<HTMLButtonElement>(null);
   const [value, setValue] = useState("");
   const { toast } = useToast();
@@ -120,9 +126,11 @@ const CheckinPage = () => {
         <div className="h-screen flex flex-col justify-center">
           <Card className="mx-auto max-w-sm w-[384px] h-[300px] ">
             <CardHeader>
-              <h1 className="text-4xl font-bold text-primary text-center">
-                {employee!.name}
-              </h1>
+              {employee && (
+                <h1 className="text-4xl font-bold text-primary text-center">
+                  {employee.name}
+                </h1>
+              )}
               <CardTitle className="text-primary text-center text-2xl">
                 {type === "check-in" ? (
                   <span>Check-in</span>
