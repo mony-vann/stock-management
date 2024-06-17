@@ -50,6 +50,7 @@ const CheckinPage = () => {
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
   const [type, setType] = useState("");
+  const [employee, setEmployee] = useState({});
   const submitRef = useRef<HTMLButtonElement>(null);
   const [value, setValue] = useState("");
   const { toast } = useToast();
@@ -83,6 +84,7 @@ const CheckinPage = () => {
         if (response.status === 200) {
           if (response.data.employee) {
             setSuccess(true);
+            setEmployee(response.data.employee);
           }
           setType(response.data.attendance);
         }
@@ -118,7 +120,10 @@ const CheckinPage = () => {
         <div className="h-screen flex flex-col justify-center">
           <Card className="mx-auto max-w-sm w-[384px] h-[300px] ">
             <CardHeader>
-              <CardTitle className="text-primary text-center text-4xl">
+              <h1 className="text-4xl font-bold text-primary text-center">
+                {employee!.name}
+              </h1>
+              <CardTitle className="text-primary text-center text-2xl">
                 {type === "check-in" ? (
                   <span>Check-in</span>
                 ) : (

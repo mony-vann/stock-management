@@ -50,7 +50,7 @@ export async function POST(req: any) {
   }
 }
 
-export async function DELETE(request: Request) {
+export async function DELETE(request: any) {
   const searchParams = request.nextUrl.searchParams;
   const id = searchParams.get("id");
   const employee = await db.employee.findFirst({
