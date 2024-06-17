@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import axios from "axios";
+import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -30,6 +31,7 @@ import {
   SelectValue,
   SelectItem,
 } from "@/components/ui/select";
+import { useToast } from "@/components/ui/use-toast";
 import { PlusCircle } from "lucide-react";
 
 const FormSchema = z.object({
@@ -44,7 +46,7 @@ const FormSchema = z.object({
     .nonempty(),
 });
 
-const AddNewStaff = ({ onAdd }: { onAdd: () => void }) => {
+const AddNewStaff = () => {
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
@@ -59,6 +61,8 @@ const AddNewStaff = ({ onAdd }: { onAdd: () => void }) => {
   const [pending, setPending] = useState(false);
   const [loading, setLoading] = useState(true);
   const [shifts, setShifts] = useState([]);
+  const router = useRouter();
+  const { toast } = useToast();
 
   const fetchShifts = async () => {
     try {
@@ -77,7 +81,11 @@ const AddNewStaff = ({ onAdd }: { onAdd: () => void }) => {
 
       if (response.status === 200) {
         form.reset();
-        onAdd();
+        router.refresh();
+        toast({
+          title: "Staff added",
+          description: "Staff has been added successfully",
+        });
         setPending(false);
       }
     };
@@ -96,7 +104,7 @@ const AddNewStaff = ({ onAdd }: { onAdd: () => void }) => {
         className="flex items-center justify-center rounded-md bg-primary h-9 px-3 text-primary-foreground"
       >
         <PlusCircle className="h-4 w-4 mr-1" />
-        <span className="sr-only text-sm font-medium sm:not-sr-only sm:whitespace-nowrap">
+        <span className="text-sm font-medium  sm:whitespace-nowrap">
           Add Staff
         </span>
       </DialogTrigger>

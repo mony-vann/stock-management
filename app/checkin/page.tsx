@@ -3,7 +3,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 import { useToast } from "@/components/ui/use-toast";
 
@@ -50,6 +50,8 @@ const CheckinPage = () => {
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
   const [type, setType] = useState("");
+  const submitRef = useRef<HTMLButtonElement>(null);
+  const [value, setValue] = useState("");
   const { toast } = useToast();
 
   useEffect(() => {
@@ -74,6 +76,7 @@ const CheckinPage = () => {
 
   const onSubmit = (data: z.infer<typeof FormSchema>) => {
     const sendCheckinRequest = async () => {
+      console.log("data", data);
       setLoading(true);
       try {
         const response = await axios.post("/api/checkin", { pin: data.pin });
@@ -86,7 +89,7 @@ const CheckinPage = () => {
       } catch (error) {
         toast({
           title: "Error",
-          description: "Error checking in",
+          description: "User not found or invalid pi",
           variant: "destructive",
         });
         console.error("Error checking in:", error);
@@ -97,6 +100,12 @@ const CheckinPage = () => {
 
     sendCheckinRequest();
   };
+
+  useEffect(() => {
+    if (value.length === 4) {
+      onSubmit({ pin: value });
+    }
+  }, [value]);
 
   return (
     <div className="w-full max-h-screen flex items-center justify-center">
@@ -133,7 +142,7 @@ const CheckinPage = () => {
         >
           <Card className="mx-auto max-w-sm">
             <CardHeader>
-              <h1 className="text-4xl font-bold text-primary">Check in</h1>
+              <h1 className="text-4xl font-bold text-primary">Check in/out</h1>
               <CardDescription>
                 Check in to your account by entering your passcode.
               </CardDescription>
@@ -150,13 +159,24 @@ const CheckinPage = () => {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>
-                          4 digits passcode for your account
+                          {locationAllowed ? (
+                            <span> 4 digits passcode for your account</span>
+                          ) : (
+                            <span className="text-red-600">
+                              {" "}
+                              Turn on location{" "}
+                            </span>
+                          )}
                         </FormLabel>
                         <FormControl>
                           <InputOTP
                             maxLength={4}
                             {...field}
                             disabled={!locationAllowed}
+                            value={value}
+                            onChange={(value) => {
+                              setValue(value);
+                            }}
                           >
                             <InputOTPGroup>
                               <InputOTPSlot index={0} />
@@ -172,7 +192,12 @@ const CheckinPage = () => {
                     )}
                   />
                   <div className="w-full flex justify-end">
-                    <Button type="submit" disabled={loading} className="mr-3">
+                    <Button
+                      ref={submitRef}
+                      type="submit"
+                      disabled={loading}
+                      className="mr-3"
+                    >
                       Submit <ArrowRight className="ml-2" />
                     </Button>
                   </div>

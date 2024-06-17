@@ -50,33 +50,29 @@ export async function POST(req: any) {
   }
 }
 
-export async function DELETE(
-  req: Request,
-  { params }: { params: { id: string } },
-) {
-  console.log("dwadwadwadwa", params.id);
+export async function DELETE(request: Request) {
+  const searchParams = request.nextUrl.searchParams;
+  const id = searchParams.get("id");
+  const employee = await db.employee.findFirst({
+    where: {
+      id: Number(id),
+    },
+  });
 
-  return new NextResponse("Employee deleted", { status: 200 });
-  // const employee = await db.employee.findFirst({
-  //   where: {
-  //     id: Number(id),
-  //   },
-  // });
-  //
-  // if (!employee) {
-  //   return new NextResponse("Employee not found", { status: 404 });
-  // }
-  //
-  // try {
-  //   await db.employee.delete({
-  //     where: {
-  //       id: Number(id),
-  //     },
-  //   });
-  //
-  //   return new NextResponse("Employee deleted", { status: 200 });
-  // } catch (error) {
-  //   console.error("Failed to delete employee:", error);
-  //   return new NextResponse("Internal error", { status: 500 });
-  // }
+  if (!employee) {
+    return new NextResponse("Employee not found", { status: 404 });
+  }
+
+  try {
+    await db.employee.delete({
+      where: {
+        id: Number(id),
+      },
+    });
+
+    return new NextResponse("Employee deleted", { status: 200 });
+  } catch (error) {
+    console.error("Failed to delete employee:", error);
+    return new NextResponse("Internal error", { status: 500 });
+  }
 }

@@ -45,10 +45,11 @@ interface DataTableProps<TData, TValue> {
 export function DataTable<TData, TValue>({
   columns,
   data,
-  loading = true,
+  // loading = true,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [search, setSearch] = React.useState<string>("");
+  const loading = false;
 
   const table = useReactTable({
     data,
@@ -157,7 +158,7 @@ export function DataTable<TData, TValue>({
         </div>
         <div className="flex items-center space-x-6 lg:space-x-8">
           <div className="flex items-center space-x-2 ">
-            <p className="text-xs text-muted-foreground font-medium">
+            <p className="hidden md:block text-xs text-muted-foreground font-medium">
               Rows per page
             </p>
             <Select
@@ -199,7 +200,7 @@ export function DataTable<TData, TValue>({
               <span className="sr-only">Go to previous page</span>
               <ChevronLeftIcon className="h-4 w-4" />
             </Button>
-            <div className="flex w-[100px] items-center justify-center text-xs text-muted-foreground font-medium">
+            <div className="hidden md:flex w-[100px] items-center justify-center text-xs text-muted-foreground font-medium">
               Page {table.getState().pagination.pageIndex + 1} of{" "}
               {table.getPageCount()}
             </div>

@@ -11,9 +11,11 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
+import EditStaff from "./editStaff";
 import { StaffColumn } from "./column";
 import { DropdownMenuTrigger } from "@radix-ui/react-dropdown-menu";
 import { Button } from "@/components/ui/button";
+import { useToast } from "@/components/ui/use-toast";
 
 interface CellActionProps {
   data: StaffColumn;
@@ -21,10 +23,16 @@ interface CellActionProps {
 
 export const CellAction: React.FC<CellActionProps> = ({ data }) => {
   const router = useRouter();
+  const { toast } = useToast();
 
   const onDelete = async (id: number) => {
     try {
-      await axios.delete(`/api/employee/${id}`);
+      await axios.delete(`/api/employee?id=${id}`);
+      toast({
+        title: "Employee deleted",
+        description: "Employee has been deleted successfully",
+      });
+      router.refresh();
     } catch (error) {
       console.error("Failed to delete employee:", error);
     }
@@ -47,9 +55,12 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
             <Eye className="w-4 h-4 mr-3" />
             View
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => "/edit"}>
-            <Edit className="w-4 h-4 mr-3" />
-            Edit
+          <DropdownMenuItem
+            onSelect={(e) => {
+              e.preventDefault();
+            }}
+          >
+            <EditStaff data={data} />
           </DropdownMenuItem>
           <DropdownMenuItem onClick={() => onDelete(data.id)}>
             <Trash className="w-4 h-4 mr-3" />
