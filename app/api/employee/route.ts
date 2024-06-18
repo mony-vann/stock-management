@@ -8,7 +8,15 @@ export async function GET() {
     },
   });
 
-  return NextResponse.json(response);
+  const formattedData = response.map((item) => ({
+    id: item.id,
+    name: item.name,
+    contact_info: item.contact_info,
+    role: item.role,
+    shifts: item.shifts,
+  }));
+
+  return NextResponse.json(formattedData);
 }
 
 export async function POST(req: any) {
