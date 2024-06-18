@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -35,7 +35,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { useRouter } from "next/navigation";
 import { Edit } from "lucide-react";
 
-type EditStaffProps = {
+interface EditStaffProps {
   data: {
     id: number;
     name: string;
@@ -43,7 +43,8 @@ type EditStaffProps = {
     role: string;
     shifts: { id: number; name: string; start_time: Date; end_time: Date }[];
   };
-};
+  onSaved?: () => void;
+}
 
 const FormSchema = z.object({
   id: z.number(),
@@ -53,12 +54,13 @@ const FormSchema = z.object({
   shift: z.string().nonempty(),
 });
 
-const EditStaff = ({ data }: EditStaffProps) => {
+const EditStaff = ({ data, onSaved }: EditStaffProps) => {
   const [loading, setLoading] = useState(true);
   const [shifts, setShifts] = useState([]);
   const [pending, setPending] = useState(false);
   const router = useRouter();
   const { toast } = useToast();
+  const formRef = useRef<any>(null);
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -81,6 +83,8 @@ const EditStaff = ({ data }: EditStaffProps) => {
           title: "Employee updated",
           description: "Employee has been updated successfully",
         });
+        formRef.current!.click();
+        onSaved && onSaved();
         router.refresh();
       } catch (error) {
         console.error("Failed to update employee:", error);
@@ -101,7 +105,10 @@ const EditStaff = ({ data }: EditStaffProps) => {
 
   return (
     <Dialog>
-      <DialogTrigger className="flex items-center w-full cursor-pointer">
+      <DialogTrigger
+        ref={formRef}
+        className="flex items-center w-full cursor-pointer"
+      >
         <Edit className="w-4 h-4 mr-3" />
         Edit
       </DialogTrigger>

@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -63,6 +63,7 @@ const AddNewStaff = () => {
   const [shifts, setShifts] = useState([]);
   const router = useRouter();
   const { toast } = useToast();
+  const dialogRef = useRef<any>(null);
 
   const fetchShifts = async () => {
     try {
@@ -87,6 +88,7 @@ const AddNewStaff = () => {
           description: "Staff has been added successfully",
         });
         setPending(false);
+        dialogRef.current!.click();
       }
     };
 
@@ -100,6 +102,7 @@ const AddNewStaff = () => {
   return (
     <Dialog>
       <DialogTrigger
+        ref={dialogRef}
         onClick={onClick}
         className="flex items-center justify-center rounded-md bg-primary h-9 px-3 text-primary-foreground"
       >

@@ -1,5 +1,6 @@
 "use client";
 
+import React, { useRef } from "react";
 import { Edit, Eye, MoreHorizontal, Trash } from "lucide-react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
@@ -41,6 +42,7 @@ interface CellActionProps {
 export const CellAction: React.FC<CellActionProps> = ({ data }) => {
   const router = useRouter();
   const { toast } = useToast();
+  const menuRef = useRef<any>();
 
   const onDelete = async (id: number) => {
     console.log("id", id);
@@ -56,11 +58,14 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
     }
   };
 
+  const closeMenu = () => {
+    console.log("close menu", menuRef.current);
+  };
   return (
     <>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="ghost" className="h-8 w-8 p-0">
+          <Button ref={menuRef} variant="ghost" className="h-8 w-8 p-0">
             <span className="sr-only">Open menu</span>
             <MoreHorizontal className="h-4 w-4" />
           </Button>
@@ -77,7 +82,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
               e.preventDefault();
             }}
           >
-            <EditStaff data={data} />
+            <EditStaff data={data} onSaved={closeMenu} />
           </DropdownMenuItem>
           <DropdownMenuItem
             onSelect={(e) => {
