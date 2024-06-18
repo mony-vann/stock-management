@@ -39,17 +39,16 @@ import { Search } from "lucide-react";
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
-  loading?: boolean;
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
-  loading,
   // loading = true,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [search, setSearch] = React.useState<string>("");
+  const [loading, setLoading] = React.useState<boolean>(false);
 
   const table = useReactTable({
     data,

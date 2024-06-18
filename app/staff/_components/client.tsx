@@ -15,10 +15,9 @@ import { File } from "lucide-react";
 
 interface StaffClientProps {
   data: StaffColumn[];
-  loading: boolean;
 }
 
-const StaffClient: React.FC<StaffClientProps> = ({ data, loading }) => {
+const StaffClient: React.FC<StaffClientProps> = ({ data }) => {
   return (
     <main className="grid flex-1 items-start gap-4 p-4  md:px-6 sm:py-0 md:gap-8">
       <div className="flex items-center">
@@ -40,7 +39,7 @@ const StaffClient: React.FC<StaffClientProps> = ({ data, loading }) => {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <DataTable columns={columns} data={data} loading={loading} />
+          <DataTable columns={columns} data={data} />
         </CardContent>
       </Card>
     </main>
