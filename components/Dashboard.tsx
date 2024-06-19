@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DollarSign, Users, CreditCard, Activity } from "lucide-react";
 import Donut_Chart from "./ui/donut-chart";
 import Bar_Chart from "./ui/bar-chart";
+import { UserButton } from "@clerk/nextjs";
 
 export function Dashboard() {
   const currentDate = new Date();
@@ -34,13 +35,18 @@ export function Dashboard() {
               Overview of your shop.
             </p>
           </div>
-          <div className="ml-auto">
-            <h1 className="text-2xl font-semibold">
-              {dayName}, {formattedDay}
-            </h1>
-            <h3 className="text-xl font-medium text-end">
-              {month}, {year}
-            </h3>
+          <div className="ml-auto flex items-center gap-x-10">
+            <div>
+              <h1 className="text-2xl font-semibold">
+                {dayName}, {formattedDay}
+              </h1>
+              <h3 className="text-xl font-medium text-end">
+                {month}, {year}
+              </h3>
+            </div>
+            <div>
+              <UserButton />
+            </div>
           </div>
         </div>
         <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:px-8">

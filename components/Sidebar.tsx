@@ -68,7 +68,7 @@ const Sidebar = (props: Props) => {
                   <Link
                     href="#"
                     className={`flex h-9 w-9 items-center justify-center rounded-lg transition-colors hover:text-primary md:h-8 md:w-8 ${
-                      isLinkActive("/orders")
+                      isLinkActive(`/orders`)
                         ? "bg-primary text-accent hover:text-primary-foreground"
                         : "text-muted-foreground"
                     }`}
@@ -84,9 +84,9 @@ const Sidebar = (props: Props) => {
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Link
-                    href="/products"
+                    href={`/products`}
                     className={`flex h-9 w-9 items-center justify-center rounded-lg transition-colors hover:text-primary md:h-8 md:w-8 ${
-                      isLinkActive("/products")
+                      isLinkActive(`/products`)
                         ? "bg-primary text-accent hover:text-primary-foreground"
                         : "text-muted-foreground "
                     }`}
@@ -102,9 +102,9 @@ const Sidebar = (props: Props) => {
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Link
-                    href="/staff"
+                    href={`/staff`}
                     className={`flex h-9 w-9 items-center justify-center rounded-lg transition-colors hover:text-primary md:h-8 md:w-8 ${
-                      isLinkActive("/staff")
+                      isLinkActive(`/staff`)
                         ? "bg-primary text-accent hover:text-primary-foreground"
                         : "text-muted-foreground "
                     }`}

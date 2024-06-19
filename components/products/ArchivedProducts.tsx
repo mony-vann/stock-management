@@ -28,7 +28,10 @@ import {
 import { MoreHorizontal } from "lucide-react";
 import { Category, Product, SubCategory } from "@prisma/client";
 import { DataTable } from "../ui/data-table";
-import { ProductColumn, columns } from "@/app/products/_component/column";
+import {
+  ProductColumn,
+  columns,
+} from "@/app/(dashboard)/products/_component/column";
 
 type Props = {
   products: Product[];

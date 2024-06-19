@@ -10,8 +10,8 @@ import {
 } from "@/components/ui/card";
 import { Category, Product, SubCategory } from "@prisma/client";
 import { DataTable } from "../ui/data-table";
-import { columns } from "@/app/products/_component/column";
-import { ProductColumn } from "@/app/products/_component/column";
+import { columns } from "@/app/(dashboard)/products/_component/column";
+import { ProductColumn } from "@/app/(dashboard)/products/_component/column";
 
 type Props = {
   products: Product[];
