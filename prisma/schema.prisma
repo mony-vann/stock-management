@@ -63,46 +63,46 @@ model Size {
 }
 
 model User {
-  id    Int     @id @default(autoincrement())
-  email String  @unique
-  name  String?
+  id       Int     @id @default(autoincrement())
+  email    String  @unique
+  name     String?
   password String
 }
 
 model Employee {
-  id Int      @id @default(autoincrement())
-  name        String
-  password    String
+  id           Int          @id @default(autoincrement())
+  name         String
+  password     String
   contact_info String?
-  role        String
-  attendance  Attendance[]
-  shifts      Shift[]
-  salaries    Salary[]
+  role         String
+  attendance   Attendance[]
+  shifts       Shift[]
+  salaries     Salary[]
 }
 
 model Attendance {
-  id Int       @id @default(autoincrement())
-  employee      Employee  @relation(fields: [employee_id], references: [id])
-  employee_id   Int
-  timestamp     DateTime
-  type          String    @default("check-in") @db.VarChar(10)
+  id          Int      @id @default(autoincrement())
+  employee    Employee @relation(fields: [employee_id], references: [id])
+  employee_id Int
+  timestamp   DateTime
+  type        String   @default("check-in") @db.VarChar(10)
 }
 
 model Shift {
-  id   Int      @id @default(autoincrement())
-  name String  @unique
-  employee   Employee[] 
+  id         Int        @id @default(autoincrement())
+  name       String     @unique
+  employee   Employee[]
   start_time DateTime
   end_time   DateTime
 }
 
 model Salary {
-  id     Int      @id @default(autoincrement())
-  employee      Employee  @relation(fields: [employee_id], references: [id])
-  employee_id   Int
-  period_start  DateTime
-  period_end    DateTime
-  regular_hours Int
+  id             Int      @id @default(autoincrement())
+  employee       Employee @relation(fields: [employee_id], references: [id])
+  employee_id    Int
+  period_start   DateTime
+  period_end     DateTime
+  regular_hours  Int
   overtime_hours Int
-  total_salary  Decimal  @db.Decimal(10, 2)
+  total_salary   Decimal  @db.Decimal(10, 2)
 }

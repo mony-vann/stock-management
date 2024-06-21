@@ -83,7 +83,6 @@ const CheckinPage = () => {
 
   const onSubmit = (data: z.infer<typeof FormSchema>) => {
     const sendCheckinRequest = async () => {
-      console.log("data", data);
       setLoading(true);
       try {
         const response = await axios.post("/api/checkin", { pin: data.pin });
@@ -97,7 +96,7 @@ const CheckinPage = () => {
       } catch (error) {
         toast({
           title: "Error",
-          description: "User not found or invalid pi",
+          description: "User not found or invalid pin",
           variant: "destructive",
         });
         console.error("Error checking in:", error);
@@ -151,7 +150,9 @@ const CheckinPage = () => {
         </div>
       ) : (
         <div
-          className={`h-screen flex flex-col justify-center ${loading ? "opacity-50 pointer-events-none" : ""}`}
+          className={`h-screen flex flex-col justify-center ${
+            loading ? "opacity-50 pointer-events-none" : ""
+          }`}
         >
           <Card className="mx-auto max-w-sm">
             <CardHeader>
