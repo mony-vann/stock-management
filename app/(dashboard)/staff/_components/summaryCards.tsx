@@ -2,7 +2,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Activity, CreditCard, DollarSign, Users } from "lucide-react";
 
 const SummaryCards = ({ totalStaffs, activeStaffs, recentLogs }: any) => {
-  console.log(totalStaffs, activeStaffs, recentLogs);
   return (
     <div className="grid gap-4 md:grid-cols-3 md:gap-4">
       <Card className="bg-gradient-to-r from-blue-100 via-blue-50 to-white">

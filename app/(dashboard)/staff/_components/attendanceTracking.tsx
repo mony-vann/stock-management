@@ -48,7 +48,7 @@ const AttendanceTracking = ({ logs, activeStaffs, staffs }: any) => {
 
       const latestStaffs = await staffsResponse.json();
       setStaffs(latestStaffs);
-    }, 60000); // Fetch every 60 seconds
+    }, 10000); // Fetch every 10 seconds
 
     return () => clearInterval(intervalId);
   }, []);
@@ -63,11 +63,11 @@ const AttendanceTracking = ({ logs, activeStaffs, staffs }: any) => {
         <div className="md:col-span-2 xl:col-span-3">
           <Card>
             <CardHeader>
-              <CardTitle>Recent Attendance Logs</CardTitle>
+              <CardTitle>Recent Attendance Logs ({logss.length})</CardTitle>
               <CardDescription>A list of recent logs for today</CardDescription>
             </CardHeader>
-            <CardContent>
-              {logs.length === 0 ? (
+            <CardContent className="h-[370px] overflow-y-scroll">
+              {logss.length === 0 ? (
                 <Alert>
                   <AlertTitle>No logs found</AlertTitle>
                   <AlertDescription>
@@ -75,7 +75,7 @@ const AttendanceTracking = ({ logs, activeStaffs, staffs }: any) => {
                   </AlertDescription>
                 </Alert>
               ) : (
-                <Table className=" h-[350px]">
+                <Table className="">
                   <TableHeader>
                     <TableRow>
                       <TableHead className="w-[200px]">Name</TableHead>
@@ -84,7 +84,7 @@ const AttendanceTracking = ({ logs, activeStaffs, staffs }: any) => {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {logss.slice(0, 5).map((log: any) => (
+                    {logss.map((log: any) => (
                       <TableRow key={log.timestamp}>
                         <TableCell>{log.employee.name}</TableCell>
                         <TableCell>
@@ -112,7 +112,7 @@ const AttendanceTracking = ({ logs, activeStaffs, staffs }: any) => {
         <div className="xl:col-span-2">
           <Card>
             <CardHeader>
-              <CardTitle>Active Staffs</CardTitle>
+              <CardTitle>Active Staffs ({activeStaffss.length})</CardTitle>
               <CardDescription>
                 A list of currently active staffs
               </CardDescription>

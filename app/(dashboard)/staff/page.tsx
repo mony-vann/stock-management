@@ -1,10 +1,10 @@
-import React from "react";
+import React, { Suspense } from "react";
 
 import StaffClient from "./_components/client";
 import SummaryCards from "./_components/summaryCards";
 import AttendanceTracking from "./_components/attendanceTracking";
 import {
-  getAttendanceRecentLogs,
+  // getAttendanceRecentLogs,
   getActiveStaffs,
 } from "@/actions/getAttendanceRecentLogs";
 
@@ -13,6 +13,15 @@ async function getStaff() {
     cache: "no-store",
   });
   const data = await staff.json();
+
+  return data;
+}
+
+async function getAttendanceRecentLogs() {
+  const logs = await fetch(process.env.API_URL + "/api/employee/logs", {
+    cache: "no-store",
+  });
+  const data = await logs.json();
 
   return data;
 }
