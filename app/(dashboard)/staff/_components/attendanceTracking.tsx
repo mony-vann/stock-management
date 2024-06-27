@@ -30,20 +30,29 @@ const AttendanceTracking = ({ logs, activeStaffs, staffs }: any) => {
   useEffect(() => {
     const intervalId = setInterval(async () => {
       const response = await fetch(
-        process.env.NEXT_PUBLIC_API_URL + "/api/employee/logs"
+        process.env.NEXT_PUBLIC_API_URL + "/api/employee/logs",
+        {
+          cache: "no-store",
+        }
       );
       const latestLogs = await response.json();
       setLogs(latestLogs);
 
       const activeStaffsResponse = await fetch(
-        process.env.NEXT_PUBLIC_API_URL + "/api/employee/active"
+        process.env.NEXT_PUBLIC_API_URL + "/api/employee/active",
+        {
+          cache: "no-store",
+        }
       );
 
       const latestActiveStaffs = await activeStaffsResponse.json();
       setActiveStaffs(latestActiveStaffs);
 
       const staffsResponse = await fetch(
-        process.env.NEXT_PUBLIC_API_URL + "/api/employee"
+        process.env.NEXT_PUBLIC_API_URL + "/api/employee",
+        {
+          cache: "no-store",
+        }
       );
 
       const latestStaffs = await staffsResponse.json();
