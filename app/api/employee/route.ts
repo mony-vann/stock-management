@@ -14,6 +14,8 @@ export async function GET() {
     contact_info: item.contact_info,
     role: item.role,
     shifts: item.shifts,
+    sex: item.sex,
+    picture: item.picture,
   }));
 
   return NextResponse.json(formattedData);
@@ -26,6 +28,8 @@ export async function POST(req: any) {
     password: data.password,
     contact_info: data.contact_info,
     role: data.role,
+    sex: data.sex,
+    picture: data.imageUrl,
   };
 
   const shift = await db.shift.findFirst({

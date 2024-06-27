@@ -10,6 +10,8 @@ export type StaffColumn = {
   contact_info: string | null;
   role: string;
   shifts: { id: number; name: string; start_time: Date; end_time: Date }[];
+  sex: string;
+  picture: string;
 };
 
 export const columns: ColumnDef<StaffColumn>[] = [
@@ -41,6 +43,10 @@ export const columns: ColumnDef<StaffColumn>[] = [
   {
     accessorKey: "contact_info",
     header: "Phone",
+  },
+  {
+    accessorKey: "sex",
+    header: "Sex",
   },
   {
     id: "actions",

@@ -6,6 +6,7 @@ import { z } from "zod";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 
+import ImageUploader from "@/components/ui/image-uploader";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -39,6 +40,8 @@ const FormSchema = z.object({
   password: z.string().nonempty().min(4).max(4),
   contact_info: z.string().nonempty().min(8).max(10),
   role: z.string().nonempty(),
+  sex: z.string().nonempty(),
+  // imageUrl: z.string().min(1),
   shift: z
     .string({
       required_error: "Shift is required",
@@ -55,6 +58,8 @@ const AddNewStaff = () => {
       contact_info: "",
       role: "",
       shift: "",
+      sex: "",
+      // imageUrl: "",
     },
   });
 
@@ -88,7 +93,6 @@ const AddNewStaff = () => {
           description: "Staff has been added successfully",
         });
         setPending(false);
-        dialogRef.current!.click();
       }
     };
 
@@ -100,7 +104,7 @@ const AddNewStaff = () => {
   };
 
   return (
-    <Dialog>
+    <Dialog modal={false}>
       <DialogTrigger
         ref={dialogRef}
         onClick={onClick}
@@ -111,26 +115,52 @@ const AddNewStaff = () => {
           Add Staff
         </span>
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent onInteractOutside={(event) => event.preventDefault()}>
         <DialogHeader>
           <DialogTitle>Add a new Staff</DialogTitle>
           <DialogDescription>Add a new staff to your team.</DialogDescription>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem className="">
-                  <FormLabel>Fullname</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <div className="flex items-center gap-x-5">
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem className="w-2/3">
+                    <FormLabel>Fullname</FormLabel>
+                    <FormControl>
+                      <Input {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="sex"
+                render={({ field }) => (
+                  <FormItem className="w-1/3">
+                    <FormLabel>Sex</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select Sex" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="male">Male</SelectItem>
+                        <SelectItem value="femail">Female</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
             <div className="w-full flex items-center gap-x-5">
               <FormField
                 control={form.control}
@@ -207,8 +237,28 @@ const AddNewStaff = () => {
                 )}
               />
             </div>
+            {/* <div className="w-full flex items-center gap-x-5">
+              <FormField
+                control={form.control}
+                name="imageUrl"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Background image</FormLabel>
+                    <FormControl>
+                      <ImageUploader
+                        value={field.value ? [field.value] : []}
+                        disabled={loading}
+                        onChange={(url: string) => field.onChange(url)}
+                        onRemove={() => field.onChange("")}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div> */}
             <div className="w-full flex justify-end">
-              <Button type="submit" className="mr-3" disabled={pending}>
+              <Button type="submit" className="mr-3">
                 {pending ? "Adding..." : "Add"}
               </Button>
             </div>

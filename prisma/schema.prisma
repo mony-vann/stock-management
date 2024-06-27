@@ -75,6 +75,8 @@ model Employee {
   password     String
   contact_info String?
   role         String
+  sex          String?
+  picture      String?
   attendance   Attendance[]
   shifts       Shift[]
   salaries     Salary[]

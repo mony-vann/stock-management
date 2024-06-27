@@ -34,6 +34,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { useRouter } from "next/navigation";
 import { Edit } from "lucide-react";
+import ImageUploader from "@/components/ui/image-uploader";
 
 interface EditStaffProps {
   data: {
@@ -42,6 +43,8 @@ interface EditStaffProps {
     contact_info: string | null;
     role: string;
     shifts: { id: number; name: string; start_time: Date; end_time: Date }[];
+    sex: string;
+    picture: string;
   };
   onSaved?: () => void;
 }
@@ -52,6 +55,8 @@ const FormSchema = z.object({
   contact_info: z.string().nonempty().min(8).max(10),
   role: z.string().nonempty(),
   shift: z.string().nonempty(),
+  sex: z.string().nonempty(),
+  picture: z.string().min(1),
 });
 
 const EditStaff = ({ data, onSaved }: EditStaffProps) => {
@@ -60,7 +65,6 @@ const EditStaff = ({ data, onSaved }: EditStaffProps) => {
   const [pending, setPending] = useState(false);
   const router = useRouter();
   const { toast } = useToast();
-  const formRef = useRef<any>(null);
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -70,6 +74,8 @@ const EditStaff = ({ data, onSaved }: EditStaffProps) => {
       contact_info: data.contact_info!,
       role: data.role,
       shift: data.shifts[0].name,
+      sex: data.sex,
+      picture: data.picture,
     },
   });
 
@@ -83,7 +89,6 @@ const EditStaff = ({ data, onSaved }: EditStaffProps) => {
           title: "Employee updated",
           description: "Employee has been updated successfully",
         });
-        formRef.current!.click();
         onSaved && onSaved();
         router.refresh();
       } catch (error) {
@@ -104,35 +109,57 @@ const EditStaff = ({ data, onSaved }: EditStaffProps) => {
   }, []);
 
   return (
-    <Dialog>
-      <DialogTrigger
-        ref={formRef}
-        className="flex items-center w-full cursor-pointer"
-      >
+    <Dialog modal={false}>
+      <DialogTrigger className="flex items-center w-full cursor-pointer">
         <Edit className="w-4 h-4 mr-3" />
         Edit
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent onInteractOutside={(event) => event.preventDefault()}>
         <DialogHeader>
           <DialogTitle>Edit Staff</DialogTitle>
           <DialogDescription>Edit information of your staff </DialogDescription>
         </DialogHeader>
         <Form {...form}>
           <form className="space-y-6" onSubmit={form.handleSubmit(onSubmit)}>
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem className="w-full">
+                  <FormLabel>Fullname</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             <div className="flex items-center gap-x-6">
               <FormField
                 control={form.control}
-                name="name"
+                name="sex"
                 render={({ field }) => (
                   <FormItem className="w-1/2">
-                    <FormLabel>Fullname</FormLabel>
-                    <FormControl>
-                      <Input {...field} />
-                    </FormControl>
+                    <FormLabel>Sex</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select Sex" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="male">Male</SelectItem>
+                        <SelectItem value="female">Female</SelectItem>
+                      </SelectContent>
+                    </Select>
                     <FormMessage />
                   </FormItem>
                 )}
               />
+
               <FormField
                 control={form.control}
                 name="contact_info"
@@ -195,6 +222,24 @@ const EditStaff = ({ data, onSaved }: EditStaffProps) => {
                 )}
               />
             </div>
+            <FormField
+              control={form.control}
+              name="picture"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Background image</FormLabel>
+                  <FormControl>
+                    <ImageUploader
+                      value={field.value ? [field.value] : []}
+                      disabled={loading}
+                      onChange={(url: string) => field.onChange(url)}
+                      onRemove={() => field.onChange("")}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             <div className="w-full flex justify-end">
               <Button type="submit" className="mr-3" disabled={pending}>
                 {pending ? "Saving..." : "Edit"}

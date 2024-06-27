@@ -75,7 +75,7 @@ const AttendanceTracking = ({ logs, activeStaffs, staffs }: any) => {
                   </AlertDescription>
                 </Alert>
               ) : (
-                <Table className="">
+                <Table>
                   <TableHeader>
                     <TableRow>
                       <TableHead className="w-[200px]">Name</TableHead>

@@ -14,8 +14,10 @@ export default function Loading() {
     <div className="flex min-h-screen w-full flex-col bg-muted/40 pt-5">
       <div className="flex items-center mx-10 mt-10">
         <div className="pl-14">
-          <Skeleton className="h-8 w-32 mb-2" />
-          <Skeleton className="h-4 w-48" />
+          <h1 className="text-2xl font-bold text-foreground">Staff</h1>
+          <p className="text-sm text-muted-foreground">
+            Overview of your staff.
+          </p>
         </div>
       </div>
       <div className="flex flex-col sm:gap-4 sm:py-4 sm:pl-14">

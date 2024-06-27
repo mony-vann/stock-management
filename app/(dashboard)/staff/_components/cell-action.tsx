@@ -36,6 +36,8 @@ interface CellActionProps {
     contact_info: string | null;
     role: string;
     shifts: { id: number; name: string; start_time: Date; end_time: Date }[];
+    sex: string;
+    picture: string;
   };
 }
 
