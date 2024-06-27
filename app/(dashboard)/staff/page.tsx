@@ -3,10 +3,9 @@ import React, { Suspense } from "react";
 import StaffClient from "./_components/client";
 import SummaryCards from "./_components/summaryCards";
 import AttendanceTracking from "./_components/attendanceTracking";
-import {
-  // getAttendanceRecentLogs,
-  getActiveStaffs,
-} from "@/actions/getAttendanceRecentLogs";
+// import // getAttendanceRecentLogs,
+// // getActiveStaffs,
+// "@/actions/getAttendanceRecentLogs";
 
 async function getStaff() {
   const staff = await fetch(process.env.API_URL + "/api/employee", {
@@ -22,6 +21,15 @@ async function getAttendanceRecentLogs() {
     cache: "no-store",
   });
   const data = await logs.json();
+
+  return data;
+}
+
+async function getActiveStaffs() {
+  const staffs = await fetch(process.env.API_URL + "/api/employee/active", {
+    cache: "no-store",
+  });
+  const data = await staffs.json();
 
   return data;
 }

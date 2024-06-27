@@ -1,6 +1,6 @@
 import { NextResponse, NextRequest } from "next/server";
 import { db } from "@/lib/db";
-import { revalidateTag } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 
 export async function POST(req: NextRequest) {
   try {
@@ -39,7 +39,7 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    revalidateTag("logs");
+    revalidatePath("/api/employee");
 
     return NextResponse.json({ attendance: type, employee });
   } catch (error) {
