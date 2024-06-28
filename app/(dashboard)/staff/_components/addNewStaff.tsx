@@ -73,6 +73,7 @@ const AddNewStaff = () => {
   const fetchShifts = async () => {
     try {
       const response = await axios.get("/api/shift");
+      console.log(response.data);
       setShifts(response.data);
       setLoading(false);
     } catch (error) {

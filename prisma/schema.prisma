@@ -9,68 +9,115 @@ generator client {
 }
 
 datasource db {
-  provider  = "postgresql"
-  url       = env("POSTGRES_PRISMA_URL") // uses connection pooling
-  directUrl = env("POSTGRES_URL_NON_POOLING") // uses a direct connection
+  provider     = "mongodb"
+  url          = env("DATABASE_URL")
+  relationMode = "prisma"
 }
 
-model Product {
-  id          Int       @id @default(autoincrement())
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  name        String    @db.VarChar(255)
-  description String?
-  status      String
-  variants    Variant[]
-  amount      Int       @default(0)
-  categoryId  Int
-  category    Category  @relation(fields: [categoryId], references: [id])
-}
+// model Product {
+//   id          Int       @id @default(autoincrement())
+//   createdAt   DateTime  @default(now())
+//   updatedAt   DateTime  @updatedAt
+//   name        String    @db.VarChar(255)
+//   description String?
+//   status      String
+//   variants    Variant[]
+//   amount      Int       @default(0)
+//   categoryId  Int
+//   category    Category  @relation(fields: [categoryId], references: [id])
+// }
 
-model Variant {
-  id            Int      @id @default(autoincrement())
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-  name          String   @db.VarChar(255)
-  productId     Int
-  subCategoryId Int
-  sizeId        Int
-  price         Float
-  amount        Int
-  product       Product  @relation(fields: [productId], references: [id])
-}
+// model Variant {
+//   id            Int      @id @default(autoincrement())
+//   createdAt     DateTime @default(now())
+//   updatedAt     DateTime @updatedAt
+//   name          String   @db.VarChar(255)
+//   productId     Int
+//   subCategoryId Int
+//   sizeId        Int
+//   price         Float
+//   amount        Int
+//   product       Product  @relation(fields: [productId], references: [id])
+// }
 
-model Category {
-  id        Int       @id @default(autoincrement())
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  name      String    @db.VarChar(255)
-  products  Product[]
-}
+// model Category {
+//   id        Int       @id @default(autoincrement())
+//   createdAt DateTime  @default(now())
+//   updatedAt DateTime  @updatedAt
+//   name      String    @db.VarChar(255)
+//   products  Product[]
+// }
 
-model SubCategory {
-  id        Int      @id @default(autoincrement())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  name      String   @db.VarChar(255)
-}
+// model SubCategory {
+//   id        Int      @id @default(autoincrement())
+//   createdAt DateTime @default(now())
+//   updatedAt DateTime @updatedAt
+//   name      String   @db.VarChar(255)
+// }
 
-model Size {
-  id        Int      @id @default(autoincrement())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  name      String   @db.VarChar(255)
-}
+// model Size {
+//   id        Int      @id @default(autoincrement())
+//   createdAt DateTime @default(now())
+//   updatedAt DateTime @updatedAt
+//   name      String   @db.VarChar(255)
+// }
+
+// model User {
+//   id       Int     @id @default(autoincrement())
+//   email    String  @unique
+//   name     String?
+//   password String
+// }
+
+// model Employee {
+//   id           Int          @id @default(autoincrement())
+//   name         String
+//   password     String
+//   contact_info String?
+//   role         String
+//   sex          String?
+//   picture      String?
+//   attendance   Attendance[]
+//   shifts       Shift[]
+//   salaries     Salary[]
+// }
+
+// model Attendance {
+//   id          Int      @id @default(autoincrement())
+//   employee    Employee @relation(fields: [employee_id], references: [id])
+//   employee_id Int
+//   timestamp   DateTime
+//   type        String   @default("check-in") @db.VarChar(10)
+// }
+
+// model Shift {
+//   id         Int        @id @default(autoincrement())
+//   name       String     @unique
+//   employee   Employee[]
+//   start_time DateTime
+//   end_time   DateTime
+// }
+
+// model Salary {
+//   id             Int      @id @default(autoincrement())
+//   employee       Employee @relation(fields: [employee_id], references: [id])
+//   employee_id    Int
+//   period_start   DateTime
+//   period_end     DateTime
+//   regular_hours  Int
+//   overtime_hours Int
+//   total_salary   Decimal  @db.Decimal(10, 2)
+// }
 
 model User {
-  id       Int     @id @default(autoincrement())
+  id       String  @id @default(auto()) @map("_id") @db.ObjectId
   email    String  @unique
   name     String?
   password String
 }
 
 model Employee {
-  id           Int          @id @default(autoincrement())
+  id           String       @id @default(auto()) @map("_id") @db.ObjectId
   name         String
   password     String
   contact_info String?
@@ -78,33 +125,32 @@ model Employee {
   sex          String?
   picture      String?
   attendance   Attendance[]
-  shifts       Shift[]
+  shift        String       @db.ObjectId
   salaries     Salary[]
 }
 
 model Attendance {
-  id          Int      @id @default(autoincrement())
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
   employee    Employee @relation(fields: [employee_id], references: [id])
-  employee_id Int
+  employee_id String   @db.ObjectId
   timestamp   DateTime
-  type        String   @default("check-in") @db.VarChar(10)
+  type        String   @default("check-in")
 }
 
 model Shift {
-  id         Int        @id @default(autoincrement())
-  name       String     @unique
-  employee   Employee[]
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  name       String   @unique
   start_time DateTime
   end_time   DateTime
 }
 
 model Salary {
-  id             Int      @id @default(autoincrement())
+  id             String   @id @default(auto()) @map("_id") @db.ObjectId
   employee       Employee @relation(fields: [employee_id], references: [id])
-  employee_id    Int
+  employee_id    String   @db.ObjectId
   period_start   DateTime
   period_end     DateTime
   regular_hours  Int
   overtime_hours Int
-  total_salary   Decimal  @db.Decimal(10, 2)
+  total_salary   Float
 }
