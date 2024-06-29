@@ -6,7 +6,6 @@ import { z } from "zod";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 
-import ImageUploader from "@/components/ui/image-uploader";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -41,7 +40,7 @@ const FormSchema = z.object({
   contact_info: z.string().nonempty().min(8).max(10),
   role: z.string().nonempty(),
   sex: z.string().nonempty(),
-  // imageUrl: z.string().min(1),
+  salary: z.string().min(1),
   shift: z
     .string({
       required_error: "Shift is required",
@@ -59,7 +58,7 @@ const AddNewStaff = () => {
       role: "",
       shift: "",
       sex: "",
-      // imageUrl: "",
+      salary: "",
     },
   });
 
@@ -122,16 +121,29 @@ const AddNewStaff = () => {
           <DialogDescription>Add a new staff to your team.</DialogDescription>
         </DialogHeader>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem className="w-full">
+                  <FormLabel>Fullname</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             <div className="flex items-center gap-x-5">
               <FormField
                 control={form.control}
-                name="name"
+                name="salary"
                 render={({ field }) => (
-                  <FormItem className="w-2/3">
-                    <FormLabel>Fullname</FormLabel>
+                  <FormItem className="w-1/2">
+                    <FormLabel>Salary</FormLabel>
                     <FormControl>
-                      <Input {...field} />
+                      <Input type="number" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -141,7 +153,7 @@ const AddNewStaff = () => {
                 control={form.control}
                 name="sex"
                 render={({ field }) => (
-                  <FormItem className="w-1/3">
+                  <FormItem className="w-1/2">
                     <FormLabel>Sex</FormLabel>
                     <Select
                       onValueChange={field.onChange}
@@ -154,7 +166,7 @@ const AddNewStaff = () => {
                       </FormControl>
                       <SelectContent>
                         <SelectItem value="male">Male</SelectItem>
-                        <SelectItem value="femail">Female</SelectItem>
+                        <SelectItem value="female">Female</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -218,7 +230,7 @@ const AddNewStaff = () => {
                   <FormItem className="w-full">
                     <FormLabel>Pin (4 digits)</FormLabel>
                     <FormControl>
-                      <Input {...field} />
+                      <Input type="number" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -231,7 +243,7 @@ const AddNewStaff = () => {
                   <FormItem className="w-full">
                     <FormLabel>Phone Number</FormLabel>
                     <FormControl>
-                      <Input {...field} />
+                      <Input type="number" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

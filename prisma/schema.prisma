@@ -127,6 +127,7 @@ model Employee {
   attendance   Attendance[]
   shift        String       @db.ObjectId
   payroll      Payroll[]
+  salary       Float
 }
 
 model Attendance {
@@ -144,11 +145,20 @@ model Shift {
   end_time   DateTime
 }
 
+type Log {
+  date   DateTime
+  status String
+}
+
 model Payroll {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  employee    Employee @relation(fields: [employee_id], references: [id])
-  employee_id String   @db.ObjectId
-  amount      Float
-  timestamp   DateTime
-  type        String   @default("salary")
+  id             String   @id @default(auto()) @map("_id") @db.ObjectId
+  employee       Employee @relation(fields: [employee_id], references: [id])
+  employee_id    String   @db.ObjectId
+  present_days   Int
+  absent_days    Int
+  permitted_days Int
+  logs           Log[]
+  amount         Float
+  timestamp      DateTime
+  type           String   @default("salary")
 }

@@ -24,6 +24,7 @@ export async function GET() {
     role: item.role,
     shift: item.shift,
     sex: item.sex,
+    salary: item.salary,
     picture: item.picture,
   }));
 
@@ -32,13 +33,13 @@ export async function GET() {
 
 export async function POST(req: any) {
   const data = await req.json();
-  console.log("data", data);
   const employeeData = {
     name: data.name,
     password: data.password,
     contact_info: data.contact_info,
     role: data.role,
     sex: data.sex,
+    salary: Number(data.salary),
     picture: data.imageUrl,
   };
 
@@ -116,6 +117,7 @@ export async function PATCH(req: any) {
     password: data.password,
     contact_info: data.contact_info,
     role: data.role,
+    salary: Number(data.salary),
     sex: data.sex,
   };
 

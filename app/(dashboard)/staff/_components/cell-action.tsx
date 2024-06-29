@@ -37,6 +37,7 @@ interface CellActionProps {
     role: string;
     shift: string;
     sex: string;
+    salary: number;
     picture: string;
   };
 }

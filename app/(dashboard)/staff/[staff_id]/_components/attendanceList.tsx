@@ -38,6 +38,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { getAttendanceByIdAndDate } from "@/actions/staffSummaryActions";
+import { LoaderCircle } from "lucide-react";
 
 const FormSchema = z.object({
   month: z.string().min(1),
@@ -60,8 +61,8 @@ const AttendanceList = ({ attendance, staffId }: any) => {
   const [selectedYear, setSelectedYear] = useState(
     String(new Date().getFullYear())
   );
+  const [pending, setPending] = useState(false);
 
-  const currentDate = new Date();
   const monthLength = new Date(
     new Date().getFullYear(),
     new Date().getMonth() + 1,
@@ -83,6 +84,7 @@ const AttendanceList = ({ attendance, staffId }: any) => {
   };
 
   const onSubmit = async (data: z.infer<typeof FormSchema>) => {
+    setPending(true);
     try {
       const response = await getAttendanceByIdAndDate(
         staffId,
@@ -92,33 +94,34 @@ const AttendanceList = ({ attendance, staffId }: any) => {
       updateCheckinsMap(response);
       setSelectedMonth(data.month);
       setSelectedYear(data.year);
+      setPending(false);
     } catch (error) {
       console.error("Error fetching attendance:", error);
     }
   };
 
   return (
-    <Card className="md:col-span-2 2xl:col-span-2">
+    <Card className="md:col-span-2 2xl:col-span-3">
       <CardHeader>
         <CardTitle>Attendance</CardTitle>
         <CardDescription>A list of recent logs the month</CardDescription>
-        <div>
+        <div className="w-full">
           <Form {...form}>
             <form
               onSubmit={form.handleSubmit(onSubmit)}
-              className="flex items-center gap-x-2 py-3 w-full justify-end"
+              className="flex items-center gap-x-2 py-3 w-full "
             >
               <FormField
                 control={form.control}
                 name="month"
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className="w-2/4">
                     <Select
                       onValueChange={field.onChange}
                       defaultValue={field.value}
                     >
                       <FormControl>
-                        <SelectTrigger className="w-[180px]">
+                        <SelectTrigger className="w-full">
                           <SelectValue placeholder="month" />
                         </SelectTrigger>
                       </FormControl>
@@ -137,13 +140,13 @@ const AttendanceList = ({ attendance, staffId }: any) => {
                 control={form.control}
                 name="year"
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className="w-[30%]">
                     <Select
                       onValueChange={field.onChange}
                       defaultValue={field.value}
                     >
                       <FormControl>
-                        <SelectTrigger className="w-[100px]">
+                        <SelectTrigger className="w-full">
                           <SelectValue placeholder="year" />
                         </SelectTrigger>
                       </FormControl>
@@ -161,7 +164,13 @@ const AttendanceList = ({ attendance, staffId }: any) => {
                   </FormItem>
                 )}
               />
-              <Button type="submit">Find</Button>
+              <Button type="submit" disabled={pending} className="w-[20%]">
+                {pending ? (
+                  <LoaderCircle size={18} className="animate-spin" />
+                ) : (
+                  "Search"
+                )}
+              </Button>
             </form>
           </Form>
         </div>

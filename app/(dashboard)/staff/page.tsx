@@ -24,7 +24,7 @@ const StaffPage = async () => {
   return (
     <div className="flex min-h-screen w-full flex-col bg-muted/40 pt-5">
       <div className="flex items-center mx-10 mt-10">
-        <div className="md:pl-10">
+        <div className="md:pl-12">
           <h1 className="text-2xl font-bold text-foreground">Staff</h1>
           <p className="text-sm text-muted-foreground">
             Overview of your staff.

@@ -44,6 +44,7 @@ interface EditStaffProps {
     role: string;
     shift: string;
     sex: string;
+    salary: number;
     // picture: string;
   };
 }
@@ -55,6 +56,7 @@ const FormSchema = z.object({
   role: z.string().min(1),
   shift: z.string().min(1),
   sex: z.string().min(1),
+  salary: z.string().min(1),
   // picture: z.string().min(1),
 });
 
@@ -75,7 +77,7 @@ const EditStaff = ({ data }: EditStaffProps) => {
       role: data.role,
       shift: data.shift,
       sex: data.sex,
-      // picture: data.picture,
+      salary: String(data.salary),
     },
   });
 
@@ -123,19 +125,34 @@ const EditStaff = ({ data }: EditStaffProps) => {
         </DialogHeader>
         <Form {...form}>
           <form className="space-y-6" onSubmit={form.handleSubmit(onSubmit)}>
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem className="w-full">
-                  <FormLabel>Fullname</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <div className="flex items-center gap-x-6">
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem className="w-2/3">
+                    <FormLabel>Fullname</FormLabel>
+                    <FormControl>
+                      <Input {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="salary"
+                render={({ field }) => (
+                  <FormItem className="w-1/3">
+                    <FormLabel>Salary</FormLabel>
+                    <FormControl>
+                      <Input {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
             <div className="flex items-center gap-x-6">
               <FormField
                 control={form.control}

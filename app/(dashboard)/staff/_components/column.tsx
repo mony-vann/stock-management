@@ -12,6 +12,7 @@ export type StaffColumn = {
   role: string;
   shift: string;
   sex: string;
+  salary: number;
   picture: string;
 };
 
@@ -43,6 +44,13 @@ export const columns: ColumnDef<StaffColumn>[] = [
     header: "Role",
   },
   {
+    accessorKey: "salary",
+    header: "Salary",
+    cell: ({ row }) => {
+      return <p className="text-sm"> ${row.original.salary} </p>;
+    },
+  },
+  {
     accessorKey: "contact_info",
     header: "Phone",
   },
@@ -50,9 +58,7 @@ export const columns: ColumnDef<StaffColumn>[] = [
     accessorKey: "sex",
     header: "Sex",
     cell: ({ row }) => {
-      return (
-        <p className="text-sm text-gray-600 capitalize"> {row.original.sex} </p>
-      );
+      return <p className="text-sm capitalize"> {row.original.sex} </p>;
     },
   },
   {
