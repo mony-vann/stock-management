@@ -91,3 +91,24 @@ export const getAttendanceData = async () => {
     timeStamp: new Date(),
   };
 };
+
+export const getAttendanceByIdAndDate = async (
+  employee_id: string,
+  month: string,
+  year: string
+) => {
+  const attendanceLogs = await db.attendance.findMany({
+    where: {
+      employee_id,
+      timestamp: {
+        gte: new Date(`${year}-${month}-01`),
+        lt: new Date(`${year}-${month}-31`),
+      },
+    },
+    orderBy: {
+      timestamp: "desc",
+    },
+  });
+
+  return attendanceLogs;
+};

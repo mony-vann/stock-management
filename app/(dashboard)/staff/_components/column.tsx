@@ -3,6 +3,7 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { Badge } from "@/components/ui/badge";
 import { CellAction } from "./cell-action";
+import Link from "next/link";
 
 export type StaffColumn = {
   id: number;
@@ -18,6 +19,11 @@ export const columns: ColumnDef<StaffColumn>[] = [
   {
     accessorKey: "name",
     header: "Name",
+    cell: ({ row }) => {
+      return (
+        <Link href={`/staff/${row.original.id}`}>{row.original.name}</Link>
+      );
+    },
   },
   {
     accessorKey: "shifts",

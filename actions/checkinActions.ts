@@ -46,6 +46,7 @@ function deg2rad(deg: number) {
 }
 
 export const pinCheck = async (pin: string) => {
+  console.log("Checking in with pin", pin);
   try {
     const employee = await db.employee.findFirst({
       where: {
@@ -54,7 +55,8 @@ export const pinCheck = async (pin: string) => {
     });
 
     if (!employee) {
-      return { error: "Invalid PIN" };
+      console.log("No employee found with PIN:", pin);
+      return;
     }
 
     const lastRecord = await db.attendance.findFirst({

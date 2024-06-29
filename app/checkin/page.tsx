@@ -83,15 +83,18 @@ const CheckinPage = () => {
       setLoading(true);
       try {
         const response = await pinCheck(data.pin);
+        if (!response) {
+          toast({
+            title: "Error",
+            description: "User not found or invalid pin",
+            variant: "destructive",
+          });
+          return;
+        }
         setSuccess(true);
-        setEmployee(response.employee);
-        setType(response.type);
+        setEmployee(response!.employee);
+        setType(response!.type);
       } catch (error) {
-        toast({
-          title: "Error",
-          description: "User not found or invalid pin",
-          variant: "destructive",
-        });
         console.error("Error checking in:", error);
       } finally {
         setLoading(false);
