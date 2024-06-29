@@ -2,7 +2,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import axios from "axios";
 import { useEffect, useState, useRef } from "react";
 import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 import { useToast } from "@/components/ui/use-toast";
@@ -29,13 +28,14 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, LoaderCircle } from "lucide-react";
+import { locationCheck, pinCheck } from "@/actions/checkinActions";
 
 interface Employee {
-  id: number;
+  id: string;
   name: string;
   role: string;
   shift: string;
-  contact_info: string;
+  contact_info: string | null;
 }
 
 const FormSchema = z.object({
@@ -55,7 +55,7 @@ const CheckinPage = () => {
   const [locationAllowed, setLocationAllowed] = useState(false);
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [type, setType] = useState("");
+  const [type, setType] = useState<string | undefined>("");
   const [employee, setEmployee] = useState<Employee>();
   const submitRef = useRef<HTMLButtonElement>(null);
   const [value, setValue] = useState("");
@@ -67,11 +67,8 @@ const CheckinPage = () => {
         const { latitude, longitude } = position.coords;
 
         try {
-          const response = await axios.post("/api/checkin/location", {
-            lat: latitude,
-            lng: longitude,
-          });
-          if (response.data.allowed) {
+          const response = await locationCheck(latitude, longitude);
+          if (response) {
             setLocationAllowed(true);
           }
         } catch (error) {
@@ -85,14 +82,10 @@ const CheckinPage = () => {
     const sendCheckinRequest = async () => {
       setLoading(true);
       try {
-        const response = await axios.post("/api/checkin", { pin: data.pin });
-        if (response.status === 200) {
-          if (response.data.employee) {
-            setSuccess(true);
-            setEmployee(response.data.employee);
-          }
-          setType(response.data.attendance);
-        }
+        const response = await pinCheck(data.pin);
+        setSuccess(true);
+        setEmployee(response.employee);
+        setType(response.type);
       } catch (error) {
         toast({
           title: "Error",

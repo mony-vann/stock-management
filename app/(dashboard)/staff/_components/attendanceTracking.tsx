@@ -21,26 +21,31 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { getAttendanceData } from "@/actions/staffSummaryActions";
 
-const AttendanceTracking = ({ logs, activeStaffs, staffs }: any) => {
+const AttendanceTracking = ({
+  logs,
+  activeStaffs,
+  staffs,
+  staffWithMostLates,
+  lastUpdatedTime,
+}: any) => {
   const [logss, setLogs] = useState(logs);
   const [activeStaffss, setActiveStaffs] = useState(activeStaffs);
   const [staffss, setStaffs] = useState(staffs);
+  const [staffWithMostLatess, setStaffWithMostLatess] =
+    useState(staffWithMostLates);
+  const [lastUpdated, setLastUpdated] = useState(new Date(lastUpdatedTime));
 
   useEffect(() => {
     const intervalId = setInterval(async () => {
-      const response = await fetch(
-        process.env.NEXT_PUBLIC_API_URL + "/api/employee/logs"
-      );
-      const latestLogs = await response.json();
-      setLogs(latestLogs);
-
-      const activeStaffsResponse = await fetch(
-        process.env.NEXT_PUBLIC_API_URL + "/api/employee/active"
-      );
-
-      const latestActiveStaffs = await activeStaffsResponse.json();
-      setActiveStaffs(latestActiveStaffs);
+      const { recentAttendanceLogs, activeStaffs, staffWithMostLates } =
+        await getAttendanceData();
+      setLogs(recentAttendanceLogs);
+      setActiveStaffs(activeStaffs);
+      setStaffWithMostLatess(staffWithMostLates);
+      setLastUpdated(new Date());
+      console.log("Fetching staffs...");
 
       const staffsResponse = await fetch(
         process.env.NEXT_PUBLIC_API_URL + "/api/employee"
@@ -48,16 +53,21 @@ const AttendanceTracking = ({ logs, activeStaffs, staffs }: any) => {
 
       const latestStaffs = await staffsResponse.json();
       setStaffs(latestStaffs);
-    }, 10000); // Fetch every 10 seconds
+    }, 300000); // Fetch every 5 minutes
 
     return () => clearInterval(intervalId);
   }, []);
   return (
     <>
+      <div className="absolute right-10 top-20">
+        <h1 className="text-sm font-bold ">
+          Last updated: {lastUpdated.toLocaleTimeString()}
+        </h1>
+      </div>
       <SummaryCards
-        totalStaffs={staffss.length}
-        activeStaffs={activeStaffss.length}
-        recentLogs={logss.length}
+        totalStaffs={staffss}
+        activeStaffs={activeStaffss}
+        staffWithMostLates={staffWithMostLatess}
       />
       <div className="grid gap-4 md:gap-4 md:grid-cols-3 xl:grid-cols-5 mt-5">
         <div className="md:col-span-2 xl:col-span-3">
@@ -80,13 +90,14 @@ const AttendanceTracking = ({ logs, activeStaffs, staffs }: any) => {
                     <TableRow>
                       <TableHead className="w-[200px]">Name</TableHead>
                       <TableHead>Status</TableHead>
+                      <TableHead>Date</TableHead>
                       <TableHead>Time</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {logss.map((log: any) => (
                       <TableRow key={log.timestamp}>
-                        <TableCell>{log.employee.name}</TableCell>
+                        <TableCell>{log.employeeName}</TableCell>
                         <TableCell>
                           {log.type === "check-in" ? (
                             <Badge className="rounded-md hover:bg-primary pointer-events-none">
@@ -97,6 +108,9 @@ const AttendanceTracking = ({ logs, activeStaffs, staffs }: any) => {
                               {log.type}
                             </Badge>
                           )}
+                        </TableCell>
+                        <TableCell>
+                          {new Date(log.timestamp).toLocaleDateString()}
                         </TableCell>
                         <TableCell>
                           {new Date(log.timestamp).toLocaleTimeString()}
@@ -128,11 +142,11 @@ const AttendanceTracking = ({ logs, activeStaffs, staffs }: any) => {
               ) : (
                 <div className="space-y-2 h-[350px] overflow-y-scroll">
                   {activeStaffss.map((staff: any) => (
-                    <Alert key={staff.employee.name}>
+                    <Alert key={staff.name}>
                       <AlertTitle className="flex items-center justify-between gap-x-2">
-                        {staff.employee.name}
+                        {staff.name}
                         <Badge className="rounded-md" variant={"outline"}>
-                          {staff.employee.role}
+                          {staff.role}
                         </Badge>
                       </AlertTitle>
                       <AlertDescription>
