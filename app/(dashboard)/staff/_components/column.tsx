@@ -9,7 +9,7 @@ export type StaffColumn = {
   name: string;
   contact_info: string | null;
   role: string;
-  shifts: { id: number; name: string; start_time: Date; end_time: Date }[];
+  shift: string;
   sex: string;
   picture: string;
 };
@@ -23,15 +23,11 @@ export const columns: ColumnDef<StaffColumn>[] = [
     accessorKey: "shifts",
     header: "Shift",
     cell: ({ row }) => {
-      const { shifts } = row.original;
-
       return (
         <div>
-          {shifts.map((shift: any, index: number) => (
-            <Badge key={index} variant={"outline"} className="mr-1">
-              {shift.name}
-            </Badge>
-          ))}
+          <Badge variant={"outline"} className="mr-1">
+            {row.original.shift}
+          </Badge>
         </div>
       );
     },
@@ -47,6 +43,11 @@ export const columns: ColumnDef<StaffColumn>[] = [
   {
     accessorKey: "sex",
     header: "Sex",
+    cell: ({ row }) => {
+      return (
+        <p className="text-sm text-gray-600 capitalize"> {row.original.sex} </p>
+      );
+    },
   },
   {
     id: "actions",

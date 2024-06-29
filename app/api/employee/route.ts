@@ -2,10 +2,19 @@ import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 
 export async function GET() {
-  const response = await db.employee.findMany({
-    include: {
-      shifts: true,
-    },
+  const response = await db.employee.findMany();
+
+  const shift = await db.shift.findMany();
+  if (!response) {
+    return new NextResponse("Internal error", { status: 500 });
+  }
+
+  shift.forEach((shift) => {
+    response.forEach((employee) => {
+      if (employee.shift === shift.id) {
+        employee.shift = shift.name;
+      }
+    });
   });
 
   const formattedData = response.map((item) => ({
@@ -13,7 +22,7 @@ export async function GET() {
     name: item.name,
     contact_info: item.contact_info,
     role: item.role,
-    shifts: item.shifts,
+    shift: item.shift,
     sex: item.sex,
     picture: item.picture,
   }));
@@ -23,6 +32,7 @@ export async function GET() {
 
 export async function POST(req: any) {
   const data = await req.json();
+  console.log("data", data);
   const employeeData = {
     name: data.name,
     password: data.password,
@@ -47,11 +57,7 @@ export async function POST(req: any) {
     const response = await db.employee.create({
       data: {
         ...employeeData,
-        shifts: {
-          connect: {
-            id: shift.id,
-          },
-        },
+        shift: shift.id,
       },
     });
 
@@ -67,21 +73,21 @@ export async function DELETE(request: any) {
   const id = searchParams.get("id");
   const attendance = await db.attendance.findFirst({
     where: {
-      employee_id: Number(id),
+      employee_id: id,
     },
   });
 
   if (attendance) {
     await db.attendance.deleteMany({
       where: {
-        employee_id: Number(id),
+        employee_id: id,
       },
     });
   }
 
   const employee = await db.employee.findFirst({
     where: {
-      id: Number(id),
+      id: id,
     },
   });
 
@@ -92,7 +98,7 @@ export async function DELETE(request: any) {
   try {
     await db.employee.delete({
       where: {
-        id: Number(id),
+        id: id,
       },
     });
 
@@ -110,6 +116,7 @@ export async function PATCH(req: any) {
     password: data.password,
     contact_info: data.contact_info,
     role: data.role,
+    sex: data.sex,
   };
 
   const shift = await db.shift.findFirst({
@@ -126,15 +133,11 @@ export async function PATCH(req: any) {
   try {
     const response = await db.employee.update({
       where: {
-        id: Number(data.id),
+        id: data.id,
       },
       data: {
         ...employeeData,
-        shifts: {
-          connect: {
-            id: shift.id,
-          },
-        },
+        shift: shift.id,
       },
     });
 

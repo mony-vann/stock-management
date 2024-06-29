@@ -35,7 +35,7 @@ interface CellActionProps {
     name: string;
     contact_info: string | null;
     role: string;
-    shifts: { id: number; name: string; start_time: Date; end_time: Date }[];
+    shift: string;
     sex: string;
     picture: string;
   };
@@ -47,7 +47,6 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
   const menuRef = useRef<any>();
 
   const onDelete = async (id: number) => {
-    console.log("id", id);
     try {
       await axios.delete(`/api/employee?id=${id}`);
       toast({
@@ -59,13 +58,9 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
       console.error("Failed to delete employee:", error);
     }
   };
-
-  const closeMenu = () => {
-    console.log("close menu", menuRef.current);
-  };
   return (
     <>
-      <DropdownMenu>
+      {/* <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button ref={menuRef} variant="ghost" className="h-8 w-8 p-0">
             <span className="sr-only">Open menu</span>
@@ -84,7 +79,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
               e.preventDefault();
             }}
           >
-            <EditStaff data={data} onSaved={closeMenu} />
+            <EditStaff data={data} />
           </DropdownMenuItem>
           <DropdownMenuItem
             onSelect={(e) => {
@@ -117,7 +112,33 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
             </AlertDialog>
           </DropdownMenuItem>
         </DropdownMenuContent>
-      </DropdownMenu>
+      </DropdownMenu> */}
+      <div className="flex items-center ml-2">
+        <EditStaff data={data} />
+        <AlertDialog>
+          <AlertDialogTrigger className="flex items-center">
+            <Trash className="w-3.5 h-3.5 mr-3" />
+          </AlertDialogTrigger>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+              <AlertDialogDescription>
+                This action cannot be undone. All attendance records will be
+                deleted and cannot be recoverd.{" "}
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction
+                className="bg-red-600"
+                onClick={() => onDelete(data.id)}
+              >
+                Delete
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      </div>
     </>
   );
 };

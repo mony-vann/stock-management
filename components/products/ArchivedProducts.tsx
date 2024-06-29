@@ -26,46 +26,50 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { MoreHorizontal } from "lucide-react";
-import { Category, Product, SubCategory } from "@prisma/client";
-import { DataTable } from "../ui/data-table";
-import {
-  ProductColumn,
-  columns,
-} from "@/app/(dashboard)/products/_component/column";
+// import { Category, Product, SubCategory } from "@prisma/client";
+// import { DataTable } from "../ui/data-table";
+// import {
+//   ProductColumn,
+//   columns,
+// } from "@/app/(dashboard)/products/_component/column";
 
-type Props = {
-  products: Product[];
-  categories: Category[];
-};
+// type Props = {
+//   products: Product[];
+//   categories: Category[];
+// };
 
-const ArchivedProducts = ({ products, categories }: Props) => {
-  const allProducts = products.map((product) => {
-    return {
-      ...product,
-      category: categories.find(
-        (category) => category.id === product.categoryId
-      ),
-    };
-  });
-  const archivedProducts = allProducts.filter(
-    (product) => product.status === "archived"
-  );
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Products</CardTitle>
-        <CardDescription>
-          Manage your products and view their sales performance.
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <DataTable
-          columns={columns}
-          data={archivedProducts as ProductColumn[]}
-        />
-      </CardContent>
-    </Card>
-  );
+// const ArchivedProducts = ({ products, categories }: Props) => {
+//   const allProducts = products.map((product) => {
+//     return {
+//       ...product,
+//       category: categories.find(
+//         (category) => category.id === product.categoryId
+//       ),
+//     };
+//   });
+//   const archivedProducts = allProducts.filter(
+//     (product) => product.status === "archived"
+//   );
+//   return (
+//     <Card>
+//       <CardHeader>
+//         <CardTitle>Products</CardTitle>
+//         <CardDescription>
+//           Manage your products and view their sales performance.
+//         </CardDescription>
+//       </CardHeader>
+//       <CardContent>
+//         <DataTable
+//           columns={columns}
+//           data={archivedProducts as ProductColumn[]}
+//         />
+//       </CardContent>
+//     </Card>
+//   );
+// };
+
+const ArchivedProducts = () => {
+  return <h1>Coming soon</h1>;
 };
 
 export default ArchivedProducts;

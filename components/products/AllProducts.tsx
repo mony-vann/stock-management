@@ -8,43 +8,47 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { MoreHorizontal } from "lucide-react";
-import { Category, Product, SubCategory } from "@prisma/client";
-import { ColumnDef } from "@tanstack/react-table";
-import { DataTable } from "../ui/data-table";
-import {
-  ProductColumn,
-  columns,
-} from "@/app/(dashboard)/products/_component/column";
+// import { Category, Product, SubCategory } from "@prisma/client";
+// import { ColumnDef } from "@tanstack/react-table";
+// import { DataTable } from "../ui/data-table";
+// import {
+//   ProductColumn,
+//   columns,
+// } from "@/app/(dashboard)/products/_component/column";
 
-type Props = {
-  products: Product[];
-  categories: Category[];
-};
+// type Props = {
+//   products: Product[];
+//   categories: Category[];
+// };
 
-const AllProducts = ({ products, categories }: Props) => {
-  const allProducts = products.map((product) => {
-    return {
-      ...product,
-      category: categories.find(
-        (category) => category.id === product.categoryId
-      ),
-    };
-  });
+// const AllProducts = ({ products, categories }: Props) => {
+//   const allProducts = products.map((product) => {
+//     return {
+//       ...product,
+//       category: categories.find(
+//         (category) => category.id === product.categoryId
+//       ),
+//     };
+//   });
 
-  console.log(allProducts);
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Products</CardTitle>
-        <CardDescription>
-          Manage your products and view their sales performance.
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <DataTable columns={columns} data={allProducts as ProductColumn[]} />
-      </CardContent>
-    </Card>
-  );
+//   console.log(allProducts);
+//   return (
+//     <Card>
+//       <CardHeader>
+//         <CardTitle>Products</CardTitle>
+//         <CardDescription>
+//           Manage your products and view their sales performance.
+//         </CardDescription>
+//       </CardHeader>
+//       <CardContent>
+//         <DataTable columns={columns} data={allProducts as ProductColumn[]} />
+//       </CardContent>
+//     </Card>
+//   );
+// };
+
+const AllProducts = () => {
+  return <h1>Coming soon</h1>;
 };
 
 export default AllProducts;

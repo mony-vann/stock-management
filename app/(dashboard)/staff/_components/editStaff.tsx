@@ -42,29 +42,29 @@ interface EditStaffProps {
     name: string;
     contact_info: string | null;
     role: string;
-    shifts: { id: number; name: string; start_time: Date; end_time: Date }[];
+    shift: string;
     sex: string;
-    picture: string;
+    // picture: string;
   };
-  onSaved?: () => void;
 }
 
 const FormSchema = z.object({
   id: z.number(),
-  name: z.string().nonempty(),
-  contact_info: z.string().nonempty().min(8).max(10),
-  role: z.string().nonempty(),
-  shift: z.string().nonempty(),
-  sex: z.string().nonempty(),
-  picture: z.string().min(1),
+  name: z.string().min(1),
+  contact_info: z.string().min(8).max(10),
+  role: z.string().min(1),
+  shift: z.string().min(1),
+  sex: z.string().min(1),
+  // picture: z.string().min(1),
 });
 
-const EditStaff = ({ data, onSaved }: EditStaffProps) => {
+const EditStaff = ({ data }: EditStaffProps) => {
   const [loading, setLoading] = useState(true);
   const [shifts, setShifts] = useState([]);
   const [pending, setPending] = useState(false);
   const router = useRouter();
   const { toast } = useToast();
+  const dialogRef = useRef<any>(null);
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -73,9 +73,9 @@ const EditStaff = ({ data, onSaved }: EditStaffProps) => {
       name: data.name,
       contact_info: data.contact_info!,
       role: data.role,
-      shift: data.shifts[0].name,
+      shift: data.shift,
       sex: data.sex,
-      picture: data.picture,
+      // picture: data.picture,
     },
   });
 
@@ -89,8 +89,8 @@ const EditStaff = ({ data, onSaved }: EditStaffProps) => {
           title: "Employee updated",
           description: "Employee has been updated successfully",
         });
-        onSaved && onSaved();
         router.refresh();
+        dialogRef.current?.click();
       } catch (error) {
         console.error("Failed to update employee:", error);
       }
@@ -109,12 +109,14 @@ const EditStaff = ({ data, onSaved }: EditStaffProps) => {
   }, []);
 
   return (
-    <Dialog modal={false}>
-      <DialogTrigger className="flex items-center w-full cursor-pointer">
-        <Edit className="w-4 h-4 mr-3" />
-        Edit
+    <Dialog>
+      <DialogTrigger
+        ref={dialogRef}
+        className="flex items-center cursor-pointer"
+      >
+        <Edit className="w-3.5 h-3.5 mr-3" />
       </DialogTrigger>
-      <DialogContent onInteractOutside={(event) => event.preventDefault()}>
+      <DialogContent>
         <DialogHeader>
           <DialogTitle>Edit Staff</DialogTitle>
           <DialogDescription>Edit information of your staff </DialogDescription>
@@ -222,26 +224,13 @@ const EditStaff = ({ data, onSaved }: EditStaffProps) => {
                 )}
               />
             </div>
-            <FormField
-              control={form.control}
-              name="picture"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Background image</FormLabel>
-                  <FormControl>
-                    <ImageUploader
-                      value={field.value ? [field.value] : []}
-                      disabled={loading}
-                      onChange={(url: string) => field.onChange(url)}
-                      onRemove={() => field.onChange("")}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
             <div className="w-full flex justify-end">
-              <Button type="submit" className="mr-3" disabled={pending}>
+              <Button
+                type="submit"
+                className="mr-3"
+                disabled={pending}
+                onClick={() => onSubmit(form.getValues())}
+              >
                 {pending ? "Saving..." : "Edit"}
               </Button>
             </div>

@@ -3,6 +3,7 @@ import React, { Suspense } from "react";
 import StaffClient from "./_components/client";
 import SummaryCards from "./_components/summaryCards";
 import AttendanceTracking from "./_components/attendanceTracking";
+import { StaffColumn } from "./_components/column";
 // import // getAttendanceRecentLogs,
 // // getActiveStaffs,
 // "@/actions/getAttendanceRecentLogs";
@@ -11,6 +12,7 @@ async function getStaff() {
   const staff = await fetch(process.env.API_URL + "/api/employee", {
     cache: "no-store",
   });
+
   const data = await staff.json();
 
   return data;
@@ -20,18 +22,18 @@ async function getAttendanceRecentLogs() {
   const logs = await fetch(process.env.API_URL + "/api/employee/logs", {
     cache: "no-store",
   });
-  const data = await logs.json();
+  // const data = await logs.json();
 
-  return data;
+  return logs;
 }
 
 async function getActiveStaffs() {
   const staffs = await fetch(process.env.API_URL + "/api/employee/active", {
     cache: "no-store",
   });
-  const data = await staffs.json();
+  // const data = await staffs.json();
 
-  return data;
+  return staffs;
 }
 
 const StaffPage = async () => {
@@ -51,11 +53,11 @@ const StaffPage = async () => {
       </div>
       <div className="flex flex-col sm:gap-4 sm:py-4 sm:pl-14">
         <div className="p-4 md:px-6">
-          <AttendanceTracking
+          {/* <AttendanceTracking
             logs={attendanceLogs}
             activeStaffs={activeStaffs}
             staffs={formattedData}
-          />
+          /> */}
           <StaffClient data={formattedData} />
         </div>
       </div>

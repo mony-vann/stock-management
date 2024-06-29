@@ -73,7 +73,6 @@ const AddNewStaff = () => {
   const fetchShifts = async () => {
     try {
       const response = await axios.get("/api/shift");
-      console.log(response.data);
       setShifts(response.data);
       setLoading(false);
     } catch (error) {
@@ -94,6 +93,7 @@ const AddNewStaff = () => {
           description: "Staff has been added successfully",
         });
         setPending(false);
+        dialogRef.current?.click();
       }
     };
 
@@ -105,7 +105,7 @@ const AddNewStaff = () => {
   };
 
   return (
-    <Dialog modal={false}>
+    <Dialog>
       <DialogTrigger
         ref={dialogRef}
         onClick={onClick}
@@ -116,7 +116,7 @@ const AddNewStaff = () => {
           Add Staff
         </span>
       </DialogTrigger>
-      <DialogContent onInteractOutside={(event) => event.preventDefault()}>
+      <DialogContent>
         <DialogHeader>
           <DialogTitle>Add a new Staff</DialogTitle>
           <DialogDescription>Add a new staff to your team.</DialogDescription>
