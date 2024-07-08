@@ -1,77 +1,20 @@
 "use client";
+import { getSummaries } from "@/actions/saleActions";
 import { BarChart, Card, Divider, Switch } from "@tremor/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { Skeleton } from "./skeleton";
 
-const data = [
-  {
-    date: "Jan 23",
-    "This Year": 68560,
-    "Last Year": 28560,
-  },
-  {
-    date: "Feb 23",
-    "This Year": 70320,
-    "Last Year": 30320,
-  },
-  {
-    date: "Mar 23",
-    "This Year": 80233,
-    "Last Year": 70233,
-  },
-  {
-    date: "Apr 23",
-    "This Year": 55123,
-    "Last Year": 45123,
-  },
-  {
-    date: "May 23",
-    "This Year": 56000,
-    "Last Year": 80600,
-  },
-  {
-    date: "Jun 23",
-    "This Year": 100000,
-    "Last Year": 85390,
-  },
-  {
-    date: "Jul 23",
-    "This Year": 85390,
-    "Last Year": 45340,
-  },
-  {
-    date: "Aug 23",
-    "This Year": 80100,
-    "Last Year": 70120,
-  },
-  {
-    date: "Sep 23",
-    "This Year": 75090,
-    "Last Year": 69450,
-  },
-  {
-    date: "Oct 23",
-    "This Year": 71080,
-    "Last Year": 63345,
-  },
-  {
-    date: "Nov 23",
-    "This Year": 61210,
-    "Last Year": 100330,
-  },
-  {
-    date: "Dec 23",
-    "This Year": 60143,
-    "Last Year": 45321,
-  },
-];
+interface Data {
+  date: string;
+  "This Year": number;
+  "Last Year": number;
+}
 
 function valueFormatter(number: number) {
   const formatter = new Intl.NumberFormat("en-US", {
     maximumFractionDigits: 0,
     notation: "compact",
     compactDisplay: "short",
-    style: "currency",
-    currency: "USD",
   });
 
   return formatter.format(number);
@@ -79,51 +22,78 @@ function valueFormatter(number: number) {
 
 export default function Bar_Chart() {
   const [showComparison, setShowComparison] = useState(false);
+  const [data, setData] = useState<Data[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchSummaries = async () => {
+      setIsLoading(true);
+      const response = await getSummaries();
+
+      setData(
+        response.map((summary) => ({
+          date: new Date(summary.data).toLocaleDateString("en-US"),
+          "This Year": summary.totalSales,
+          "Last Year": 0,
+        }))
+      );
+      setIsLoading(false);
+    };
+
+    fetchSummaries();
+  }, []);
+
   return (
     <>
-      <Card className="sm:mx-auto">
-        <h1 className="text-2xl font-semibold leading-none tracking-tight text-tremor-content-strong dark:text-dark-tremor-content-strong">
-          Sales overview
-        </h1>
-        <p className="mt-1 text-tremor-default text-tremor-content dark:text-dark-tremor-content">
-          Overview of your sales performance.
-        </p>
-        <BarChart
-          data={data}
-          index="date"
-          categories={
-            showComparison ? ["Last Year", "This Year"] : ["This Year"]
-          }
-          colors={showComparison ? ["cyan", "blue"] : ["blue"]}
-          valueFormatter={valueFormatter}
-          yAxisWidth={45}
-          className="mt-6 hidden h-80 sm:block"
-        />
-        <BarChart
-          data={data}
-          index="date"
-          categories={
-            showComparison ? ["Last Year", "This Year"] : ["This Year"]
-          }
-          colors={showComparison ? ["cyan", "blue"] : ["blue"]}
-          valueFormatter={valueFormatter}
-          showYAxis={false}
-          className="mt-4 h-56 sm:hidden"
-        />
-        <Divider />
-        <div className="mb-2 flex items-center space-x-3">
-          <Switch
-            id="comparison"
-            onChange={() => setShowComparison(!showComparison)}
+      {isLoading ? (
+        <Card>
+          <Skeleton className="w-full h-40" />
+        </Card>
+      ) : (
+        <Card className="sm:mx-auto">
+          <h1 className="text-2xl font-semibold leading-none tracking-tight text-tremor-content-strong dark:text-dark-tremor-content-strong">
+            Sales overview
+          </h1>
+          <p className="mt-1 text-tremor-default text-tremor-content dark:text-dark-tremor-content">
+            Overview of your sales performance.
+          </p>
+          <BarChart
+            data={data}
+            index="date"
+            categories={
+              showComparison ? ["Last Year", "This Year"] : ["This Year"]
+            }
+            colors={showComparison ? ["cyan", "blue"] : ["blue"]}
+            valueFormatter={valueFormatter}
+            yAxisWidth={45}
+            className="mt-6 hidden h-80 sm:block"
           />
-          <label
-            htmlFor="comparison"
-            className="text-tremor-default text-tremor-content dark:text-dark-tremor-content"
-          >
-            Show same period last year
-          </label>
-        </div>
-      </Card>
+          <BarChart
+            data={data}
+            index="date"
+            categories={
+              showComparison ? ["Last Year", "This Year"] : ["This Year"]
+            }
+            colors={showComparison ? ["cyan", "blue"] : ["blue"]}
+            valueFormatter={valueFormatter}
+            showYAxis={false}
+            className="mt-4 h-56 sm:hidden"
+          />
+          <Divider />
+          <div className="mb-2 flex items-center space-x-3">
+            <Switch
+              id="comparison"
+              onChange={() => setShowComparison(!showComparison)}
+            />
+            <label
+              htmlFor="comparison"
+              className="text-tremor-default text-tremor-content dark:text-dark-tremor-content"
+            >
+              Show same period last year
+            </label>
+          </div>
+        </Card>
+      )}
     </>
   );
 }

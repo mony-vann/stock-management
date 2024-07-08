@@ -162,3 +162,37 @@ model Payroll {
   timestamp      DateTime
   type           String   @default("salary")
 }
+
+model Sale {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  invoiceNo  String
+  startDate  DateTime
+  stopDate   DateTime
+  cashier    String
+  tableNo    String
+  subTotal   Float
+  vat        Float
+  discount   Float
+  grandTotal Float
+  free       Float
+  balance    Float
+  recDollar  Float
+  riel       Float
+  creditCard Float
+  revenue    Float
+  createdAt  DateTime @default(now())
+}
+
+model SaleSummary {
+  id                String   @id @default(auto()) @map("_id") @db.ObjectId
+  data              DateTime
+  totalSales        Float
+  totalAmount       Int
+  totalSubTotal     Float
+  totalVAT          Float
+  totalDiscounts    Float
+  totalRevenue      Float
+  averageSaleAmount Float
+  largestSale       Float
+  smallestSale      Float
+}
