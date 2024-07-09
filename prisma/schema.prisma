@@ -196,3 +196,33 @@ model SaleSummary {
   largestSale       Float
   smallestSale      Float
 }
+
+model BottleSale {
+  id              String   @id @default(auto()) @map("_id") @db.ObjectId
+  itemCode        String
+  date            DateTime
+  itemDescription String
+  quantity        Int
+  unitPrice       Float
+  cost            Float
+  subTotal        Float
+  tax             Float
+  discount        Float
+  free            Float
+  extPrice        Float
+  extCost         Float
+  margin          Float
+}
+
+model BottleSaleSummary {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  date          DateTime
+  totalQuantity Int
+  totalMargin   Float
+}
+
+model Bottle {
+  id       String @id @default(auto()) @map("_id") @db.ObjectId
+  itemCode String
+  itemName String
+}

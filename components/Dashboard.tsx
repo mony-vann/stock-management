@@ -1,17 +1,32 @@
 "use client";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { DollarSign, Users, CreditCard, Activity } from "lucide-react";
-import Donut_Chart from "./ui/donut-chart";
-import Bar_Chart from "./ui/bar-chart";
+import {
+  DollarSign,
+  Users,
+  CreditCard,
+  Activity,
+  CupSoda,
+  Percent,
+} from "lucide-react";
 import { UserButton } from "@clerk/nextjs";
 import { useEffect, useState } from "react";
 import {
+  getCurrentMonthSalesReport,
   getDailySales,
+  getDifferencesPercentagesFromLastMonth,
   getDifferencesPercentagesFromYesterday,
   getLatestSummaries,
 } from "@/actions/saleActions";
 import { SummaryCardSkeletons } from "./dashboard/SummaryCardSkeletons";
+import SaleChart from "./dashboard/SaleChart";
+import FixedExpensePieChart from "./dashboard/FixedExpensePieChart";
+import BottleAmountChart from "./dashboard/BottleAmountChart";
+import SaleRevenueChart from "./dashboard/SaleRevenueChart";
+import TopDrinkChart from "./dashboard/TopDrinkChart";
+import { Badge } from "./ui/badge";
+import { Button } from "./ui/button";
+import { getCurrentMonthBottleSaleSummary } from "@/actions/bottleSaleActions";
 
 interface DailyReport {
   data: Date;
@@ -40,6 +55,7 @@ interface Difference {
 
 export function Dashboard() {
   const [dailyReport, setDailyReport] = useState<DailyReport | null>(null);
+  const [monthlyBottle, setMonthlyBottle] = useState<number | null>(null);
   const [d, setD] = useState<Difference | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [day, setDay] = useState<number>(10);
@@ -62,8 +78,9 @@ export function Dashboard() {
     const fetchDailySales = async () => {
       setIsLoading(true);
       try {
-        const response = await getLatestSummaries();
-        const differences = await getDifferencesPercentagesFromYesterday();
+        const response = await getCurrentMonthSalesReport();
+        const differences = await getDifferencesPercentagesFromLastMonth();
+        const montlyBottleReport = await getCurrentMonthBottleSaleSummary();
 
         setDay(response!.data.getDate());
         setDayName(response!.data.toLocaleString("en-US", { weekday: "long" }));
@@ -71,7 +88,8 @@ export function Dashboard() {
         setYear(response!.data.getFullYear());
 
         setDailyReport(response);
-        setD(differences);
+        setD(differences.percentages);
+        setMonthlyBottle(montlyBottleReport.totalQuantity);
       } catch (error) {
         console.error("Error fetching data:", error);
       } finally {
@@ -95,10 +113,7 @@ export function Dashboard() {
           </div>
           <div className="ml-auto flex items-center gap-x-10">
             <div>
-              <h1 className="text-2xl font-semibold">
-                {dayName}, {formattedDay}
-              </h1>
-              <h3 className="text-xl font-medium text-end">
+              <h3 className="text-2xl font-medium text-end">
                 {month}, {year}
               </h3>
             </div>
@@ -112,78 +127,145 @@ export function Dashboard() {
             <SummaryCardSkeletons />
           ) : (
             <div className="grid gap-4 md:grid-cols-2 md:gap-5 lg:grid-cols-4">
-              <Card>
+              <Card className="rounded-3xl">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">
-                    Total Revenue
+                  <CardTitle className="flex items-center justify-between w-full">
+                    <Button variant={"muted"} disabled className="rounded-xl">
+                      <DollarSign className="h-4 w-4 text-gray-900" />
+                    </Button>
+                    {d?.totalRevenue! >= 0 ? (
+                      <Badge className="rounded-full bg-blue-600 hover:bg-blue-600 text-sm">
+                        +{d?.totalRevenue.toFixed(2)}%
+                      </Badge>
+                    ) : (
+                      <Badge className="rounded-lg bg-red-600 hover:bg-red-600 text-sm">
+                        {d?.totalRevenue.toFixed(2)}%
+                      </Badge>
+                    )}
                   </CardTitle>
-                  <DollarSign className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">
-                    ${dailyReport?.totalRevenue}
+                <CardContent className="mt-5">
+                  <p className="text-sm">Total Revenue</p>
+                  <div className="flex items-center gap-x-1">
+                    <div className="text-3xl font-bold">
+                      ${dailyReport?.totalRevenue}
+                    </div>
+                    <div className="font-light text-xs">
+                      <p className=" leading-3">
+                        Revenue vs <br />
+                        last month
+                      </p>
+                    </div>
                   </div>
-                  <p className="text-xs text-muted-foreground">
-                    {d?.totalRevenue.toFixed(2)}% from yesterday
-                  </p>
                 </CardContent>
               </Card>
-              <Card>
+              <Card className="rounded-3xl">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Sales</CardTitle>
-                  <CreditCard className="h-4 w-4 text-muted-foreground" />
+                  <CardTitle className="flex items-center justify-between w-full">
+                    <Button variant={"muted"} disabled className="rounded-xl">
+                      <CreditCard className="h-4 w-4 text-gray-900" />
+                    </Button>
+                    {d?.totalSales! >= 0 ? (
+                      <Badge className="rounded-full bg-blue-600 hover:bg-blue-600 text-sm">
+                        +{d?.totalSales.toFixed(2)}%
+                      </Badge>
+                    ) : (
+                      <Badge className="rounded-lg bg-red-600 hover:bg-red-600 text-sm">
+                        {d?.totalSales.toFixed(2)}%
+                      </Badge>
+                    )}
+                  </CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">
-                    +{dailyReport?.totalSales}
+                <CardContent className="mt-5">
+                  <p className="text-sm">Total Sales</p>
+                  <div className="flex items-center gap-x-1">
+                    <div className="text-3xl font-bold">
+                      {dailyReport?.totalSales}
+                    </div>
+                    <div className="font-light text-xs">
+                      <p className=" leading-3">
+                        Sale vs <br />
+                        last month
+                      </p>
+                    </div>
                   </div>
-                  <p className="text-xs text-muted-foreground">
-                    {d?.totalSales.toFixed(2)}% from yesterday
-                  </p>
                 </CardContent>
               </Card>
-              <Card>
+              <Card className="rounded-3xl">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">
-                    Average Sale Amount
+                  <CardTitle className="flex items-center justify-between w-full">
+                    <Button variant={"muted"} disabled className="rounded-xl">
+                      <Percent className="h-4 w-4 text-gray-900" />
+                    </Button>
+                    {d?.averageSaleAmount! >= 0 ? (
+                      <Badge className="rounded-full bg-blue-600 hover:bg-blue-600 text-sm">
+                        +{d?.averageSaleAmount.toFixed(2)}%
+                      </Badge>
+                    ) : (
+                      <Badge className="rounded-lg bg-red-600 hover:bg-red-600 text-sm">
+                        {d?.averageSaleAmount.toFixed(2)}%
+                      </Badge>
+                    )}
                   </CardTitle>
-                  <Users className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">
-                    ${dailyReport?.averageSaleAmount?.toFixed(2)}
+                <CardContent className="mt-5">
+                  <p className="text-sm">Average Sale</p>
+                  <div className="flex items-center gap-x-1">
+                    <div className="text-3xl font-bold">
+                      ${dailyReport?.averageSaleAmount}
+                    </div>
+                    <div className="font-light text-xs">
+                      <p className=" leading-3">
+                        avg sale vs <br />
+                        last month
+                      </p>
+                    </div>
                   </div>
-                  <p className="text-xs text-muted-foreground">
-                    {d?.averageSaleAmount.toFixed(2)}% from yesterday
-                  </p>
                 </CardContent>
               </Card>
-              <Card>
+              <Card className="rounded-3xl">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">
-                    Largest Sale Amount
+                  <CardTitle className="flex items-center justify-between w-full">
+                    <Button variant={"muted"} disabled className="rounded-xl">
+                      <CupSoda className="h-4 w-4 text-gray-900" />
+                    </Button>
+                    {d?.largestSale! >= 0 ? (
+                      <Badge className="rounded-full bg-blue-600 hover:bg-blue-600 text-sm">
+                        +{d?.largestSale.toFixed(2)}%
+                      </Badge>
+                    ) : (
+                      <Badge className="rounded-lg bg-red-600 hover:bg-red-600 text-sm">
+                        {d?.largestSale.toFixed(2)}%
+                      </Badge>
+                    )}
                   </CardTitle>
-                  <Activity className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">
-                    ${dailyReport?.largestSale}
+                <CardContent className="mt-5">
+                  <p className="text-sm">Drink Sold</p>
+                  <div className="flex items-center gap-x-1">
+                    <div className="text-3xl font-bold">{monthlyBottle}</div>
+                    <div className="font-light text-xs">
+                      <p className=" leading-3">
+                        sale vs <br />
+                        last month
+                      </p>
+                    </div>
                   </div>
-                  <p className="text-xs text-muted-foreground">
-                    {d?.largestSale.toFixed(2)}% from yesterday
-                  </p>
                 </CardContent>
               </Card>
             </div>
           )}
-
           <div className="grid gap-4 md:gap-8 lg:grid-cols-3 xl:grid-cols-5">
             <div className="col-span-2 xl:col-span-3">
-              <Bar_Chart />
+              {/* <SaleChart /> */}
+              <SaleRevenueChart />
+              {/* <FixedExpensePieChart /> */}
             </div>
             <div className="xl:col-span-2">
-              <Donut_Chart />
+              {/* <TopDrinkChart /> */}
+              <BottleAmountChart />
             </div>
+            <div className="xl:col-span-5"></div>
           </div>
         </main>
       </div>

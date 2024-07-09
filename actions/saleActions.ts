@@ -36,16 +36,13 @@ interface DailyReport {
 }
 
 export const postSaleData = async (salesData: SaleData[]) => {
-  console.log("Uploading sales data:", salesData[0].startDate);
-  const existingSales = await db.saleSummary.findMany({
+  const existingSales = await db.sale.findFirst({
     where: {
-      data: salesData[0].startDate,
+      startDate: salesData[0].startDate,
     },
   });
 
-  console.log("Existing sales data:", existingSales);
-
-  if (existingSales.length > 0) {
+  if (existingSales) {
     throw new Error("Sales data already exists for the given start date");
   }
 
@@ -53,7 +50,7 @@ export const postSaleData = async (salesData: SaleData[]) => {
     const response = await db.sale.createMany({
       data: salesData,
     });
-    return response;
+    return "response";
   } catch (error) {
     console.error("Error uploading data:", error);
     throw error;
@@ -110,6 +107,61 @@ export const getDailySales = async (date: Date) => {
     largestSale: dailyReport._max.grandTotal,
     smallestSale: dailyReport._min.grandTotal,
   };
+};
+
+export const getCurrentMonthSalesReport = async () => {
+  const currentDate = new Date();
+  const startOfCurrentMonth = new Date(
+    Date.UTC(currentDate.getUTCFullYear(), currentDate.getUTCMonth(), 1)
+  );
+  const endOfCurrentMonth = new Date(
+    Date.UTC(currentDate.getUTCFullYear(), currentDate.getUTCMonth() + 1, 0)
+  );
+
+  const summaries = await db.saleSummary.findMany({
+    where: {
+      data: {
+        gte: startOfCurrentMonth,
+        lte: endOfCurrentMonth,
+      },
+    },
+  });
+
+  if (summaries.length === 0) {
+    return null; // Or you could return a default object with zeros
+  }
+
+  const report = summaries.reduce(
+    (acc, curr) => ({
+      totalSales: acc.totalSales + curr.totalSales,
+      totalAmount: acc.totalAmount + curr.totalAmount,
+      totalRevenue: acc.totalRevenue + curr.totalRevenue,
+      totalSubTotal: acc.totalSubTotal + curr.totalSubTotal,
+      totalVAT: acc.totalVAT + curr.totalVAT,
+      totalDiscounts: acc.totalDiscounts + curr.totalDiscounts,
+      averageSaleAmount: 0, // We'll calculate this after
+      largestSale: Math.max(acc.largestSale, curr.largestSale),
+      smallestSale: Math.min(acc.smallestSale, curr.smallestSale),
+      data: curr.data,
+    }),
+    {
+      totalSales: 0,
+      totalAmount: 0,
+      totalRevenue: 0,
+      totalSubTotal: 0,
+      totalVAT: 0,
+      totalDiscounts: 0,
+      averageSaleAmount: 0,
+      largestSale: -Infinity,
+      smallestSale: Infinity,
+      data: new Date(),
+    }
+  );
+
+  // Calculate average sale amount
+  report.averageSaleAmount = report.totalAmount / report.totalSales;
+
+  return report;
 };
 
 export const postDailyReport = async (date: Date) => {
@@ -210,4 +262,150 @@ export const getDifferencesPercentagesFromYesterday = async () => {
   };
 
   return percentages;
+};
+
+export const getDifferencesPercentagesFromLastMonth = async () => {
+  const currentDate = new Date();
+  const currentMonthStart = new Date(
+    Date.UTC(currentDate.getUTCFullYear(), currentDate.getUTCMonth(), 1)
+  );
+  const lastMonthStart = new Date(
+    Date.UTC(currentDate.getUTCFullYear(), currentDate.getUTCMonth() - 1, 1)
+  );
+
+  const currentMonthData = await getCurrentMonthSalesReport();
+  const lastMonthData = await getMonthSalesReport(lastMonthStart);
+
+  if (!currentMonthData || !lastMonthData) {
+    const percentages = {
+      totalSales: 0,
+      totalAmount: 0,
+      totalRevenue: 0,
+      totalSubTotal: 0,
+      totalVAT: 0,
+      totalDiscounts: 0,
+      averageSaleAmount: 0,
+      largestSale: 0,
+      smallestSale: 0,
+    };
+    return { percentages };
+  }
+
+  const differences = {
+    totalSales: currentMonthData.totalSales - lastMonthData.totalSales,
+    totalAmount: currentMonthData.totalAmount - lastMonthData.totalAmount,
+    totalRevenue: currentMonthData.totalRevenue - lastMonthData.totalRevenue,
+    totalSubTotal: currentMonthData.totalSubTotal - lastMonthData.totalSubTotal,
+    totalVAT: currentMonthData.totalVAT - lastMonthData.totalVAT,
+    totalDiscounts:
+      currentMonthData.totalDiscounts - lastMonthData.totalDiscounts,
+    averageSaleAmount:
+      currentMonthData.averageSaleAmount - lastMonthData.averageSaleAmount,
+    largestSale: currentMonthData.largestSale - lastMonthData.largestSale,
+    smallestSale: currentMonthData.smallestSale - lastMonthData.smallestSale,
+  };
+
+  const percentages = {
+    totalSales: calculatePercentage(
+      differences.totalSales,
+      lastMonthData.totalSales
+    ),
+    totalAmount: calculatePercentage(
+      differences.totalAmount,
+      lastMonthData.totalAmount
+    ),
+    totalRevenue: calculatePercentage(
+      differences.totalRevenue,
+      lastMonthData.totalRevenue
+    ),
+    totalSubTotal: calculatePercentage(
+      differences.totalSubTotal,
+      lastMonthData.totalSubTotal
+    ),
+    totalVAT: calculatePercentage(differences.totalVAT, lastMonthData.totalVAT),
+    totalDiscounts: calculatePercentage(
+      differences.totalDiscounts,
+      lastMonthData.totalDiscounts
+    ),
+    averageSaleAmount: calculatePercentage(
+      differences.averageSaleAmount,
+      lastMonthData.averageSaleAmount
+    ),
+    largestSale: calculatePercentage(
+      differences.largestSale,
+      lastMonthData.largestSale
+    ),
+    smallestSale: calculatePercentage(
+      differences.smallestSale,
+      lastMonthData.smallestSale
+    ),
+  };
+
+  return {
+    differences,
+    percentages,
+  };
+};
+
+// Helper function to calculate percentage and handle division by zero
+function calculatePercentage(difference: number, base: number): number {
+  if (base === 0) {
+    return difference > 0 ? Infinity : difference < 0 ? -Infinity : 0;
+  }
+  return (difference / base) * 100;
+}
+
+// Function to get sales report for a specific month
+export const getMonthSalesReport = async (date: Date) => {
+  const startOfTargetMonth = new Date(
+    Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), 1)
+  );
+  const endOfTargetMonth = new Date(
+    Date.UTC(date.getUTCFullYear(), date.getUTCMonth() + 1, 0)
+  );
+
+  const summaries = await db.saleSummary.findMany({
+    where: {
+      data: {
+        gte: startOfTargetMonth,
+        lte: endOfTargetMonth,
+      },
+    },
+  });
+
+  if (summaries.length === 0) {
+    return null;
+  }
+
+  const report = summaries.reduce(
+    (acc, curr) => ({
+      totalSales: acc.totalSales + curr.totalSales,
+      totalAmount: acc.totalAmount + curr.totalAmount,
+      totalRevenue: acc.totalRevenue + curr.totalRevenue,
+      totalSubTotal: acc.totalSubTotal + curr.totalSubTotal,
+      totalVAT: acc.totalVAT + curr.totalVAT,
+      totalDiscounts: acc.totalDiscounts + curr.totalDiscounts,
+      averageSaleAmount: 0, // We'll calculate this after
+      largestSale: Math.max(acc.largestSale, curr.largestSale),
+      smallestSale: Math.min(acc.smallestSale, curr.smallestSale),
+      data: curr.data,
+    }),
+    {
+      totalSales: 0,
+      totalAmount: 0,
+      totalRevenue: 0,
+      totalSubTotal: 0,
+      totalVAT: 0,
+      totalDiscounts: 0,
+      averageSaleAmount: 0,
+      largestSale: -Infinity,
+      smallestSale: Infinity,
+      data: new Date(),
+    }
+  );
+
+  // Calculate average sale amount
+  report.averageSaleAmount = report.totalAmount / report.totalSales;
+
+  return report;
 };

@@ -20,6 +20,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import ExcelToJson from "./dashboard/ExcelToJson";
+import BottleSalesToJson from "./dashboard/BottleSalesToJson";
 type Props = {};
 
 const Sidebar = (props: Props) => {
@@ -140,7 +141,8 @@ const Sidebar = (props: Props) => {
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <ExcelToJson />
+                  {/* <ExcelToJson /> */}
+                  <BottleSalesToJson />
                 </TooltipTrigger>
                 <TooltipContent side="right">Analytics</TooltipContent>
               </Tooltip>
