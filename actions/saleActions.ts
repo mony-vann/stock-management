@@ -50,7 +50,7 @@ export const postSaleData = async (salesData: SaleData[]) => {
     const response = await db.sale.createMany({
       data: salesData,
     });
-    return "response";
+    return response;
   } catch (error) {
     console.error("Error uploading data:", error);
     throw error;
@@ -60,43 +60,77 @@ export const postSaleData = async (salesData: SaleData[]) => {
 const prisma = new PrismaClient();
 
 export const getDailySales = async (date: Date) => {
+  // Convert the input date to GMT+7
+  const clientDate = new Date(date.getTime() + 7 * 60 * 60 * 1000);
+
+  // Set to start of day in GMT+7
   const startOfDay = new Date(
-    Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate())
+    Date.UTC(
+      clientDate.getUTCFullYear(),
+      clientDate.getUTCMonth(),
+      clientDate.getUTCDate(),
+      -7,
+      0,
+      0,
+      0 // This is equivalent to 00:00:00 in GMT+7
+    )
   );
+
+  const startOfNextDay = new Date(
+    Date.UTC(
+      clientDate.getUTCFullYear(),
+      clientDate.getUTCMonth(),
+      clientDate.getUTCDate() + 1,
+      -7,
+      0,
+      0,
+      0 // This is equivalent to 00:00:00 in GMT+7
+    )
+  );
+
+  // Set to end of day in GMT+7
   const endOfDay = new Date(
-    Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate() + 1)
+    Date.UTC(
+      clientDate.getUTCFullYear(),
+      clientDate.getUTCMonth(),
+      clientDate.getUTCDate(),
+      16,
+      59,
+      59,
+      999 // This is equivalent to 23:59:59.999 in GMT+7
+    )
   );
 
   const dailyReport = await prisma.sale.aggregate({
     where: {
       startDate: {
         gte: startOfDay,
-        lte: endOfDay,
+        lt: endOfDay,
       },
     },
     _count: {
-      id: true, // Total number of sales
+      id: true,
     },
     _sum: {
-      grandTotal: true, // Total sales amount
-      revenue: true, // Total revenue
-      subTotal: true, // Total before tax and discounts
-      vat: true, // Total VAT
-      discount: true, // Total discounts
+      grandTotal: true,
+      revenue: true,
+      subTotal: true,
+      vat: true,
+      discount: true,
     },
     _avg: {
-      grandTotal: true, // Average sale amount
+      grandTotal: true,
     },
     _max: {
-      grandTotal: true, // Largest sale
+      grandTotal: true,
     },
     _min: {
-      grandTotal: true, // Smallest sale
+      grandTotal: true,
     },
   });
 
   return {
-    date: startOfDay,
+    date: startOfNextDay,
     totalSales: dailyReport._count.id,
     totalAmount: dailyReport._sum.grandTotal,
     totalRevenue: dailyReport._sum.revenue,

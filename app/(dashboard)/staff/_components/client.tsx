@@ -20,7 +20,7 @@ interface StaffClientProps {
 const StaffClient: React.FC<StaffClientProps> = ({ data }) => {
   return (
     <main className="grid flex-1 items-start gap-4 sm:py-0 md:gap-8 mt-10">
-      <div className="flex items-center">
+      {/* <div className="flex items-center">
         <div className="ml-auto flex items-center gap-2">
           <Button size="sm" variant="outline" className="gap-1">
             <File className="h-3.5 w-3.5" />
@@ -28,12 +28,14 @@ const StaffClient: React.FC<StaffClientProps> = ({ data }) => {
               Export
             </span>
           </Button>
-          <AddNewStaff />
         </div>
-      </div>
-      <Card>
+      </div> */}
+      <Card className="rounded-3xl">
         <CardHeader>
-          <CardTitle>Staffs List</CardTitle>
+          <div className="flex items-center justify-between">
+            <CardTitle>Staffs List</CardTitle>
+            <AddNewStaff />
+          </div>
           <CardDescription>
             Manage your staffs and view their performance.
           </CardDescription>

@@ -122,7 +122,7 @@ export const getLatestAmountSoldEachBottle = async () => {
     const groupedSales: Record<string, any[]> = {};
     response.forEach((sale) => {
       const itemCode = sale.itemCode;
-      const groupKey = itemCode.length === 7 ? itemCode.slice(0, -2) : itemCode;
+      const groupKey = itemCode.length >= 7 ? itemCode.slice(0, -2) : itemCode;
       if (!groupedSales[groupKey]) {
         groupedSales[groupKey] = [];
       }
@@ -215,6 +215,41 @@ export const postBottleSaleSummary = async (date: Date) => {
     return response;
   } catch (error) {
     console.error("Error posting bottle sales summary:", error);
+    throw error;
+  }
+};
+
+// Add this to your server actions file
+
+export const getDrinkTrendData = async (
+  itemCode: string,
+  startDate: Date,
+  endDate: Date
+) => {
+  try {
+    const response = await db.bottleSale.groupBy({
+      by: ["date"],
+      where: {
+        itemCode: itemCode,
+        date: {
+          gte: startDate,
+          lte: endDate,
+        },
+      },
+      _sum: {
+        quantity: true,
+      },
+      orderBy: {
+        date: "asc",
+      },
+    });
+
+    return response.map((item) => ({
+      date: item.date.toISOString().split("T")[0],
+      quantity: item._sum.quantity || 0,
+    }));
+  } catch (error) {
+    console.error("Error fetching drink trend data:", error);
     throw error;
   }
 };

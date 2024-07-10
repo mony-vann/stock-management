@@ -71,7 +71,7 @@ const AttendanceTracking = ({
       />
       <div className="grid gap-4 md:gap-4 md:grid-cols-3 xl:grid-cols-5 mt-5">
         <div className="md:col-span-2 xl:col-span-3">
-          <Card>
+          <Card className="rounded-3xl">
             <CardHeader>
               <CardTitle>Recent Attendance Logs ({logss.length})</CardTitle>
               <CardDescription>A list of recent logs for today</CardDescription>
@@ -124,7 +124,7 @@ const AttendanceTracking = ({
           </Card>
         </div>
         <div className="xl:col-span-2">
-          <Card>
+          <Card className="rounded-3xl">
             <CardHeader>
               <CardTitle>Active Staffs ({activeStaffss.length})</CardTitle>
               <CardDescription>

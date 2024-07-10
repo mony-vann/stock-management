@@ -239,7 +239,7 @@ const BottleSalesToJson = forwardRef<HTMLDivElement, {}>((props, _ref) => {
           input.click();
         }}
       >
-        <Import className="w-5 h-5" />
+        <Import className="w-5 h-5 stroke-gray-500" />
       </Button>
     </div>
   );

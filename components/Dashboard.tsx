@@ -27,6 +27,7 @@ import TopDrinkChart from "./dashboard/TopDrinkChart";
 import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
 import { getCurrentMonthBottleSaleSummary } from "@/actions/bottleSaleActions";
+import DrinkTrend from "./dashboard/DrinkTrend";
 
 interface DailyReport {
   data: Date;
@@ -277,6 +278,9 @@ export function Dashboard() {
             </div>
             <div className="lg:hidden block xl:col-span-5">
               <FixedExpensePieChart />
+            </div>
+            <div className="col-span-full">
+              <DrinkTrend />
             </div>
           </div>
         </main>
