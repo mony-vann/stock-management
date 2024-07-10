@@ -57,17 +57,17 @@ const BottleSalesToJson = forwardRef<HTMLDivElement, {}>((props, _ref) => {
       reader.onload = (e) => {
         const data = e.target?.result;
         if (data) {
-          const workbook = XLSX.read(data, { type: "binary" });
+          const workbook = XLSX.read(data, { type: "array" });
           const sheetName = workbook.SheetNames[0];
           const sheet = workbook.Sheets[sheetName];
-          const json = XLSX.utils.sheet_to_json(sheet, { raw: false });
+          const json = XLSX.utils.sheet_to_json(sheet);
 
           if (file.name.toLowerCase().includes("bottle")) {
             const clean = cleanBottlesData(json);
             setBottles(clean);
           } else if (file.name.toLowerCase().includes("report")) {
-            const clean = cleanSalesData(json);
-            setSalesData(clean);
+            const processedData = cleanSalesData(json);
+            setSalesData(processedData);
           } else {
             toast({
               title: "Unrecognized file",
@@ -113,8 +113,6 @@ const BottleSalesToJson = forwardRef<HTMLDivElement, {}>((props, _ref) => {
     // Create Date object
     const date = new Date(isoDateString);
 
-    console.log(date.toISOString());
-
     const cleanedData = data.map((row) => ({
       ...row,
       date: date,
@@ -124,7 +122,7 @@ const BottleSalesToJson = forwardRef<HTMLDivElement, {}>((props, _ref) => {
   };
 
   const cleanSalesData = (jsonData: any[]) => {
-    const data = jsonData.slice(4, -5).map((row: any) => ({
+    const data = jsonData.slice(4, -2).map((row: any) => ({
       invoiceNo: row["__EMPTY_1"] || "",
       startDate: isExcelDate(row["__EMPTY_2"])
         ? excelDateToJSDate(row["__EMPTY_2"])
@@ -145,6 +143,8 @@ const BottleSalesToJson = forwardRef<HTMLDivElement, {}>((props, _ref) => {
       creditCard: parseFloat(row["__EMPTY_20"]) || 0,
       revenue: parseFloat(row["__EMPTY_21"]) || 0,
     }));
+
+    console.log("Sales data:", data);
 
     return data;
   };
@@ -229,6 +229,7 @@ const BottleSalesToJson = forwardRef<HTMLDivElement, {}>((props, _ref) => {
   return (
     <div className="col-start-4">
       <Button
+        variant={"outline"}
         className="w-9 h-9 rounded-lg p-0"
         onClick={() => {
           const input = document.createElement("input");

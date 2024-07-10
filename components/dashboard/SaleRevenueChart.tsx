@@ -194,10 +194,10 @@ const SaleRevenueChart = () => {
 
       setFilteredData(filteredData);
     }
-  }, [data]);
+  }, [data, timeRange]);
 
   return (
-    <Card className="rounded-3xl">
+    <Card className="rounded-3xl h-[500px]">
       <CardHeader className="flex items-center gap-2 space-y-0 border-b py-5 sm:flex-row">
         <div className="grid flex-1 gap-1 text-center sm:text-left">
           <CardTitle>Sale & Revenue Overview</CardTitle>
@@ -225,10 +225,10 @@ const SaleRevenueChart = () => {
           </SelectContent>
         </Select>
       </CardHeader>
-      <CardContent className="px-2 pt-4 sm:px-6 sm:pt-6">
+      <CardContent className="px-2 pt-4 sm:px-6 sm:pt-6 ">
         <ChartContainer
           config={chartConfig}
-          className="aspect-auto h-[250px] w-full"
+          className="aspect-auto h-[350px] w-full"
         >
           <AreaChart data={filteredData || []}>
             <defs>

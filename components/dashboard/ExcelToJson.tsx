@@ -93,6 +93,7 @@ const ExcelToJson = forwardRef<HTMLDivElement, {}>((props, _ref) => {
             }));
 
           setSalesData(processedData);
+          console.log("Sales data:", processedData);
         }
       };
       reader.readAsArrayBuffer(file);
@@ -100,29 +101,29 @@ const ExcelToJson = forwardRef<HTMLDivElement, {}>((props, _ref) => {
   };
 
   useEffect(() => {
-    if (salesData.length > 0) {
-      postSaleData(salesData)
-        .then(async () => {
-          const response = await postDailyReport(salesData[0].startDate)
-            .then(() => {
-              toast({
-                title: "Data uploaded successfully",
-                description: "Data has been uploaded successfully",
-              });
-            })
-            .catch((error) => {
-              console.error("Error uploading data:", error);
-              // You can add some error feedback here
-            });
-        })
-        .catch((error) => {
-          console.error("Error uploading data:", error);
-          toast({
-            title: "Data already exists for the given date",
-            description: "Please upload a different file",
-          });
-        });
-    }
+    // if (salesData.length > 0) {
+    //   postSaleData(salesData)
+    //     .then(async () => {
+    //       const response = await postDailyReport(salesData[0].startDate)
+    //         .then(() => {
+    //           toast({
+    //             title: "Data uploaded successfully",
+    //             description: "Data has been uploaded successfully",
+    //           });
+    //         })
+    //         .catch((error) => {
+    //           console.error("Error uploading data:", error);
+    //           // You can add some error feedback here
+    //         });
+    //     })
+    //     .catch((error) => {
+    //       console.error("Error uploading data:", error);
+    //       toast({
+    //         title: "Data already exists for the given date",
+    //         description: "Please upload a different file",
+    //       });
+    //     });
+    // }
   }, [salesData]);
 
   return (

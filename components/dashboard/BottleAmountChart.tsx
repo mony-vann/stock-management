@@ -28,12 +28,14 @@ import { useEffect, useState } from "react";
 import { getLatestAmountSoldEachBottle } from "@/actions/bottleSaleActions";
 import { randomInt } from "crypto";
 import { Alert, AlertTitle } from "../ui/alert";
+import { Badge } from "../ui/badge";
 
 interface ChartData {
   drink: string;
   amount: number;
   fill?: string;
   date?: Date;
+  percentage?: string;
 }
 
 interface ChartItem {
@@ -89,7 +91,6 @@ function removeSizeFromDrinks(data: ChartData[]): ChartData[] {
 
 export function BottleAmountChart() {
   const [data, setData] = useState<ChartData[] | null>(null);
-  const [allData, setAllData] = useState<any[] | null>(null); // [1]
   const [topDrinks, setTopDrinks] = useState<ChartData[] | null>(null);
   const [chartConfig, setChartConfig] = useState<ChartConfig>(baseChartConfig);
 
@@ -114,7 +115,19 @@ export function BottleAmountChart() {
           }
         );
 
-        const removedSizeData = removeSizeFromDrinks(processedData);
+        // Calculate the total amount of all products
+        const totalAmount = processedData.reduce(
+          (sum, item) => sum + item.amount,
+          0
+        );
+
+        // Calculate percentage for each product
+        const dataWithPercentage = processedData.map((item) => ({
+          ...item,
+          percentage: ((item.amount / totalAmount) * 100).toFixed(2),
+        }));
+
+        const removedSizeData = removeSizeFromDrinks(dataWithPercentage);
         setData(removedSizeData);
 
         const dynamicConfig = generateChartConfig(removedSizeData);
@@ -133,7 +146,7 @@ export function BottleAmountChart() {
   }, []);
 
   return (
-    <Card className="flex flex-col h-[650px] rounded-3xl">
+    <Card className="flex flex-col h-[500px] rounded-3xl">
       <CardHeader className="pb-0">
         <CardTitle>Top Five Drinks</CardTitle>
         <CardDescription>
@@ -165,25 +178,32 @@ export function BottleAmountChart() {
       </CardContent>
       <CardFooter className="flex-col gap-2 text-sm">
         {topDrinks?.map((item) => (
-          <Alert key={item.drink}>
-            <div className="flex items-center justify-between">
-              <div className="flex items-start gap-x-2">
-                <div
-                  className="mt-[1px]"
-                  style={{
-                    width: "0.75rem",
-                    height: "0.75rem",
-                    borderRadius: "0.125rem",
-                    backgroundColor: item.fill,
-                  }}
-                />
+          // <Alert key={item.drink}>
+          <div
+            className="flex items-center w-full justify-between"
+            key={item.drink}
+          >
+            <div className="flex items-start gap-x-2">
+              <div
+                className="mt-[3px]"
+                style={{
+                  width: "0.75rem",
+                  height: "0.75rem",
+                  borderRadius: "0.125rem",
+                  backgroundColor: item.fill,
+                }}
+              />
+
+              <div className="flex items-center gap-x-2">
                 <AlertTitle className="capitalize">
                   {item.drink.replace("_", " ")}
                 </AlertTitle>
+
+                <Badge variant={"outline"}>{item.percentage}%</Badge>
               </div>
-              <AlertTitle>{item.amount}</AlertTitle>
             </div>
-          </Alert>
+            <AlertTitle>{item.amount}</AlertTitle>
+          </div>
         ))}
       </CardFooter>
     </Card>

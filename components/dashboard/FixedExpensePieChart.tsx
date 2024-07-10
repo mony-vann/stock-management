@@ -76,7 +76,7 @@ const FixedExpensePieChart = () => {
   }, []);
 
   return (
-    <Card className="flex flex-col h-[650px]">
+    <Card className="flex flex-col h-[500px] rounded-3xl">
       <CardHeader className=" pb-0">
         <CardTitle>Operating Expense</CardTitle>
         <CardDescription>
@@ -136,23 +136,24 @@ const FixedExpensePieChart = () => {
       </CardContent>
       <CardFooter className="flex-col gap-2 text-sm">
         {chartData.map((item) => (
-          <Alert key={item.type}>
-            <div className="flex items-center justify-between">
-              <div className="flex items-start gap-x-2">
-                <div
-                  className="mt-[1px]"
-                  style={{
-                    width: "0.75rem",
-                    height: "0.75rem",
-                    borderRadius: "0.125rem",
-                    backgroundColor: item.bg,
-                  }}
-                />
-                <AlertTitle className="capitalize">{item.type}</AlertTitle>
-              </div>
-              <AlertTitle>${item.expense}</AlertTitle>
+          <div
+            className="flex items-center w-full justify-between"
+            key={item.type}
+          >
+            <div className="flex items-start gap-x-2">
+              <div
+                className="mt-[1px]"
+                style={{
+                  width: "0.75rem",
+                  height: "0.75rem",
+                  borderRadius: "0.125rem",
+                  backgroundColor: item.bg,
+                }}
+              />
+              <AlertTitle className="capitalize">{item.type}</AlertTitle>
             </div>
-          </Alert>
+            <AlertTitle>${item.expense}</AlertTitle>
+          </div>
         ))}
       </CardFooter>
     </Card>
