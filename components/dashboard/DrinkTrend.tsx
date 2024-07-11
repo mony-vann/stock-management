@@ -88,13 +88,13 @@ const DrinkTrend = () => {
   };
 
   return (
-    <Card className="rounded-3xl">
+    <Card className="rounded-3xl ">
       <CardHeader className="flex flex-col items-stretch space-y-0 border-b p-0">
         <div className="flex flex-1 flex-col justify-center gap-1 px-6 py-5 sm:py-6">
           <div className="flex items-center justify-between">
             <CardTitle>Drink Trend</CardTitle>{" "}
             <Select onValueChange={(value) => setSelectedBottle(value)}>
-              <SelectTrigger className="w-[300px]">
+              <SelectTrigger className="w-[150px] md:w-[300px]">
                 <SelectValue placeholder="Select a bottle" />
               </SelectTrigger>
               <SelectContent className="w-[300px]">
