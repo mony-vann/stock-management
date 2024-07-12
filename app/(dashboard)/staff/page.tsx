@@ -18,8 +18,13 @@ async function getStaff() {
 
 const StaffPage = async () => {
   const formattedData = await getStaff();
-  const { recentAttendanceLogs, activeStaffs, staffWithMostLates, timeStamp } =
-    await getAttendanceData();
+  const {
+    recentAttendanceLogs,
+    activeStaffs,
+    staffWithMostLates,
+    staffWithMostEarlyLeaves,
+    timeStamp,
+  } = await getAttendanceData();
 
   return (
     <div className="flex min-h-screen w-full flex-col bg-muted/40 pt-5">
@@ -38,6 +43,7 @@ const StaffPage = async () => {
             activeStaffs={activeStaffs}
             staffs={formattedData}
             staffWithMostLates={staffWithMostLates}
+            staffWithMostEarlyLeaves={staffWithMostEarlyLeaves}
             lastUpdatedTime={timeStamp}
           />
           <StaffClient data={formattedData} />

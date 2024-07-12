@@ -47,7 +47,7 @@ const Payroll = ({ payrolls, attendance, staff }: any) => {
         </div>
         <CardDescription>A list of payments</CardDescription>
       </CardHeader>
-      <CardContent className="h-[370px] overflow-y-scroll">
+      <CardContent className="h-[370px] overflow-y-auto">
         {payrolls.length === 0 ? (
           <Alert>
             <AlertTitle>No payment found</AlertTitle>

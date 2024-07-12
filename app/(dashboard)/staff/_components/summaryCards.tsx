@@ -1,10 +1,20 @@
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Activity, CreditCard, DollarSign, Users } from "lucide-react";
+import {
+  Activity,
+  CircleOff,
+  Clock3,
+  Clock4,
+  CreditCard,
+  DollarSign,
+  Users,
+} from "lucide-react";
 
 const SummaryCards = ({
   totalStaffs,
   activeStaffs,
   staffWithMostLates,
+  staffWithMostEarlyLeaves,
 }: any) => {
   const sexCountTotal = totalStaffs.reduce(
     (count: any, staff: any) => {
@@ -31,48 +41,83 @@ const SummaryCards = ({
   );
 
   return (
-    <div className="grid gap-4 md:grid-cols-3 md:gap-4">
-      <Card className="bg-gradient-to-r from-blue-100 via-blue-50 to-white rounded-3xl ">
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Total Staffs</CardTitle>
-          <Users className="h-4 w-4 text-muted-foreground" />
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold">{totalStaffs.length} Staffs</div>
-          <p className="text-xs text-muted-foreground">
-            {sexCountTotal.male} male, {sexCountTotal.female} female
-          </p>
-        </CardContent>
-      </Card>
-      <Card className="bg-gradient-to-r from-blue-100 via-blue-50 to-white rounded-3xl">
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">
-            Currently Clock-in Staffs
-          </CardTitle>
-          <Activity className="h-4 w-4 text-muted-foreground" />
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold">{activeStaffs.length} Staffs</div>
-          <p className="text-xs text-muted-foreground">
-            {roleCountActive.barista} Barista(s), {roleCountActive.cleaner}{" "}
-            Cleaner(s)
-          </p>
-        </CardContent>
-      </Card>
-      <Card className="bg-gradient-to-r from-blue-100 via-blue-50 to-white rounded-3xl">
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">
-            Staff with most lates
-          </CardTitle>
-          <CreditCard className="h-4 w-4 text-muted-foreground" />
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold">{staffWithMostLates.name}</div>
-          <p className="text-xs text-muted-foreground">
-            with {staffWithMostLates.lateCount} lates
-          </p>
-        </CardContent>
-      </Card>
+    <div className="grid gap-4 md:grid-cols-5 md:gap-4">
+      <div className="space-y-4">
+        <Card className="rounded-3xl flex items-center p-5 gap-x-5">
+          <Button disabled className="rounded-xl w-16 h-16 bg-[#0565ff40]">
+            <Users className="h-10 w-10 text-[#0565FF]" />
+          </Button>
+          <div>
+            <p className="text-sm font-medium">Total Staffs</p>
+            <div className="flex items-center gap-x-3">
+              <div className="text-3xl font-bold flex items-center gap-x-5">
+                {totalStaffs.length}
+              </div>
+              <div className="font-light text-xs hidden md:block lg:hidden xl:block">
+                <p className="leading-3">
+                  {sexCountTotal.male} male, {sexCountTotal.female} female
+                </p>
+              </div>
+            </div>
+          </div>
+        </Card>
+        <Card className="rounded-3xl flex items-center p-5 gap-x-5">
+          <Button disabled className="rounded-xl w-16 h-16 bg-[#0565ff40]">
+            <Clock4 className="h-10 w-10  text-[#0565ff]" />
+          </Button>
+          <div>
+            <p className="text-sm font-medium">Most Late Check-in</p>
+            <div className="items-center gap-x-3">
+              <div className="text-xl font-bold flex items-center gap-x-5">
+                {staffWithMostLates?.name || "No staff"}
+              </div>
+              <div className="font-light text-xs hidden md:block lg:hidden xl:block">
+                <p className="leading-3">
+                  with {staffWithMostLates?.lateCount || 0} lates
+                </p>
+              </div>
+            </div>
+          </div>
+        </Card>
+      </div>
+      <div className="space-y-4">
+        <Card className="rounded-3xl flex items-start p-5 gap-x-5">
+          <Button disabled className="rounded-xl w-16 h-16 bg-[#0565ff40]">
+            <Activity className="h-10 w-10 text-[#0565ff]" />
+          </Button>
+          <div>
+            <p className="text-sm font-medium">Currently Clock-in</p>
+            <div className="flex items-center gap-x-3">
+              <div className="text-3xl font-bold flex items-center gap-x-5">
+                {activeStaffs.length}
+              </div>
+              <div className="font-light text-xs hidden md:block lg:hidden xl:block">
+                <p className="leading-3">
+                  {roleCountActive.barista} Barista(s)
+                </p>
+              </div>
+            </div>
+          </div>
+        </Card>
+        <Card className="rounded-3xl flex items-start p-5 gap-x-5 ">
+          <Button disabled className="rounded-xl w-16 h-16 bg-[#0565ff40]">
+            <Clock3 className="h-10 w-10 text-[#0565ff]" />
+          </Button>
+          <div>
+            <p className="text-sm font-medium">Most Early Check-out</p>
+            <div className="items-center gap-x-3">
+              <div className="text-xl font-bold flex items-center gap-x-5">
+                {staffWithMostEarlyLeaves?.name || "No staff"}
+              </div>
+              <div className="font-light text-xs hidden md:block lg:hidden xl:block">
+                <p className="leading-3">
+                  with {staffWithMostEarlyLeaves?.earlyLeaveCount || 0} earlys
+                </p>
+              </div>
+            </div>
+          </div>
+        </Card>
+      </div>
     </div>
   );
 };

@@ -29,6 +29,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { ArrowRight, LoaderCircle } from "lucide-react";
 import { locationCheck, pinCheck } from "@/actions/checkinActions";
+import { Input } from "@/components/ui/input";
 
 interface Employee {
   id: string;
@@ -42,6 +43,7 @@ const FormSchema = z.object({
   pin: z.string().min(4, {
     message: "Your one-time password must be 4 characters.",
   }),
+  reason: z.string().optional(),
 });
 
 const CheckinPage = () => {
@@ -49,6 +51,7 @@ const CheckinPage = () => {
     resolver: zodResolver(FormSchema),
     defaultValues: {
       pin: "",
+      reason: "",
     },
   });
 
@@ -58,7 +61,6 @@ const CheckinPage = () => {
   const [type, setType] = useState<string | undefined>("");
   const [employee, setEmployee] = useState<Employee>();
   const submitRef = useRef<HTMLButtonElement>(null);
-  const [value, setValue] = useState("");
   const { toast } = useToast();
 
   useEffect(() => {
@@ -82,7 +84,7 @@ const CheckinPage = () => {
     const sendCheckinRequest = async () => {
       setLoading(true);
       try {
-        const response = await pinCheck(data.pin);
+        const response = await pinCheck(data);
         if (!response) {
           toast({
             title: "Error",
@@ -103,12 +105,6 @@ const CheckinPage = () => {
 
     sendCheckinRequest();
   };
-
-  useEffect(() => {
-    if (value.length === 4) {
-      onSubmit({ pin: value });
-    }
-  }, [value]);
 
   return (
     <div className="w-full max-h-screen flex items-center justify-center">
@@ -161,7 +157,7 @@ const CheckinPage = () => {
               <Form {...form}>
                 <form
                   onSubmit={form.handleSubmit(onSubmit)}
-                  className=" space-y-10"
+                  className=" space-y-5"
                 >
                   <FormField
                     control={form.control}
@@ -183,10 +179,6 @@ const CheckinPage = () => {
                             maxLength={4}
                             {...field}
                             disabled={!locationAllowed}
-                            value={value}
-                            onChange={(value) => {
-                              setValue(value);
-                            }}
                           >
                             <InputOTPGroup>
                               <InputOTPSlot index={0} />
@@ -201,12 +193,25 @@ const CheckinPage = () => {
                       </FormItem>
                     )}
                   />
+                  <FormField
+                    control={form.control}
+                    name="reason"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Reason (Late/Early Leave)</FormLabel>
+                        <FormControl>
+                          <Input {...field} placeholder="Enter your reason" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
                   <div className="w-full flex justify-end">
                     <Button
                       ref={submitRef}
                       type="submit"
                       disabled={loading}
-                      className="mr-3"
+                      className="mr-3 mt-5"
                     >
                       Submit <ArrowRight className="ml-2" />
                     </Button>

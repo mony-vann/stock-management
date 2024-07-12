@@ -131,11 +131,14 @@ model Employee {
 }
 
 model Attendance {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  employee    Employee @relation(fields: [employee_id], references: [id])
-  employee_id String   @db.ObjectId
-  timestamp   DateTime
-  type        String   @default("check-in")
+  id                String   @id @default(auto()) @map("_id") @db.ObjectId
+  employee          Employee @relation(fields: [employee_id], references: [id])
+  employee_id       String   @db.ObjectId
+  timestamp         DateTime
+  type              String   @default("check-in")
+  reason            String?
+  status            String   @default("on-time")
+  minutesDifference Int
 }
 
 model Shift {

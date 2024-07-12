@@ -18,16 +18,22 @@ export const getAttendanceData = async () => {
       },
       timestamp: true,
       type: true,
+      status: true,
+      minutesDifference: true,
     },
   });
 
   const recentAttendanceLogs = attendanceLogs
-    .map((log) => ({
-      employeeName: log.employee.name,
-      timestamp: log.timestamp,
-      type: log.type,
-    }))
-    .slice(0, 10);
+    .map((log) => {
+      return {
+        employeeName: log.employee.name,
+        timestamp: log.timestamp.toISOString(), // Send as ISO string
+        type: log.type,
+        status: log.status,
+        minutesDiff: log.minutesDifference,
+      };
+    })
+    .slice(0, 30);
 
   const groupedLogs = attendanceLogs.reduce((acc, log) => {
     const name = log.employee.name;
@@ -47,24 +53,19 @@ export const getAttendanceData = async () => {
       timestamp: log.timestamp,
     }));
 
-  // Fetch all shifts
-  const shifts = await db.shift.findMany();
+  // Calculate late check-ins and early check-outs
+  const lateCounts = {} as Record<string, number>;
+  const earlyLeaveCounts = {} as Record<string, number>;
 
-  // Calculate late check-ins
-  const lateCounts = attendanceLogs.reduce((acc, log) => {
-    if (log.type === "check-in" && log.employee.shift) {
-      const shift = shifts.find((s) => s.id === log.employee.shift);
-      if (shift) {
-        const shiftStart = new Date(log.timestamp);
-        shiftStart.setHours(shift.start_time.getHours());
-        shiftStart.setMinutes(shift.start_time.getMinutes());
-        if (log.timestamp < shiftStart) {
-          acc[log.employee.id] = (acc[log.employee.id] || 0) + 1;
-        }
-      }
+  attendanceLogs.forEach((log) => {
+    if (log.type === "check-in" && log.status === "late") {
+      lateCounts[log.employee.id] = (lateCounts[log.employee.id] || 0) + 1;
     }
-    return acc;
-  }, {} as Record<string, number>);
+    if (log.type === "check-out" && log.status === "early") {
+      earlyLeaveCounts[log.employee.id] =
+        (earlyLeaveCounts[log.employee.id] || 0) + 1;
+    }
+  });
 
   // Find the staff with the most lates
   let maxLates = 0;
@@ -79,6 +80,21 @@ export const getAttendanceData = async () => {
     }
   }
 
+  // Find the staff with the most early leaves
+  let maxEarlyLeaves = 0;
+  let staffWithMostEarlyLeaves = null;
+
+  for (const [employeeId, earlyLeaveCount] of Object.entries(
+    earlyLeaveCounts
+  )) {
+    if (earlyLeaveCount > maxEarlyLeaves) {
+      maxEarlyLeaves = earlyLeaveCount;
+      staffWithMostEarlyLeaves = attendanceLogs.find(
+        (log) => log.employee.id === employeeId
+      )?.employee;
+    }
+  }
+
   return {
     recentAttendanceLogs,
     activeStaffs,
@@ -86,6 +102,12 @@ export const getAttendanceData = async () => {
       ? {
           name: staffWithMostLates.name,
           lateCount: maxLates,
+        }
+      : null,
+    staffWithMostEarlyLeaves: staffWithMostEarlyLeaves
+      ? {
+          name: staffWithMostEarlyLeaves.name,
+          earlyLeaveCount: maxEarlyLeaves,
         }
       : null,
     timeStamp: new Date(),
