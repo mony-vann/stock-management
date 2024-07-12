@@ -34,7 +34,7 @@ const Payroll = ({ payrolls, attendance, staff }: any) => {
 
   const paymentStatus = isPaid ? "Paid" : "Unpaid";
   return (
-    <Card className="md:col-span-3 2xl:col-span-2">
+    <Card className="w-full md:col-span-1 lg:col-span-2 2xl:col-span-2">
       <CardHeader>
         <div className="flex items-center justify-between w-full">
           <div className="flex items-center gap-x-2">
@@ -56,35 +56,37 @@ const Payroll = ({ payrolls, attendance, staff }: any) => {
             </AlertDescription>
           </Alert>
         ) : (
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Type</TableHead>
-                <TableHead>Net Pay</TableHead>
-                <TableHead>Base Salary</TableHead>
-                <TableHead>Deduction</TableHead>
-                <TableHead>Date</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {payrolls.map((payroll: any) => (
-                <TableRow key={payroll.id}>
-                  <TableCell className="capitalize">
-                    <Badge className="rounded-md hover:bg-primary">
-                      {" "}
-                      {payroll.type}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>${payroll.amount}</TableCell>
-                  <TableCell>${payroll.earned}</TableCell>
-                  <TableCell>${payroll.deductions}</TableCell>
-                  <TableCell>
-                    {new Date(payroll.timestamp).toISOString().split("T")[0]}
-                  </TableCell>
+          <div className="h-[300px] relative overflow-auto">
+            <Table>
+              <TableHeader className="sticky top-0">
+                <TableRow>
+                  <TableHead>Type</TableHead>
+                  <TableHead>Net Pay</TableHead>
+                  <TableHead>Base Salary</TableHead>
+                  <TableHead>Deduction</TableHead>
+                  <TableHead>Date</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {payrolls.map((payroll: any) => (
+                  <TableRow key={payroll.id}>
+                    <TableCell className="capitalize">
+                      <Badge className="rounded-md hover:bg-primary">
+                        {" "}
+                        {payroll.type}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>${payroll.amount}</TableCell>
+                    <TableCell>${payroll.earned}</TableCell>
+                    <TableCell>${payroll.deductions}</TableCell>
+                    <TableCell>
+                      {new Date(payroll.timestamp).toISOString().split("T")[0]}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
         )}
       </CardContent>
     </Card>

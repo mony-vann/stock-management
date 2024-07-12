@@ -142,12 +142,12 @@ export function Dashboard() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="mt-5">
-                  <p className="text-sm">Total Revenue</p>
+                  <p className="text-sm mb-0 lg:mb-2 xl:mb-0">Total Revenue</p>
                   <div className="flex items-center gap-x-3">
-                    <div className="text-3xl font-bold flex items-center gap-x-5">
+                    <div className="text-3xl font-bold gap-x-5 ">
                       ${dailyReport?.totalRevenue?.toFixed(2)}
                       <p className="font-light text-xs md:hidden lg:block xl:hidden">
-                        Revenue vs last month
+                        Revenue vs last monthdwa
                       </p>
                     </div>
                     <div className="font-light text-xs hidden md:block lg:hidden xl:block">
@@ -177,9 +177,11 @@ export function Dashboard() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="mt-5">
-                  <p className="text-sm">Total Recipes (បុង)</p>
+                  <p className="text-sm mb-0 lg:mb-2 xl:mb-0">
+                    Total Recipes (បុង)
+                  </p>
                   <div className="flex items-center gap-x-3">
-                    <div className="text-3xl font-bold flex items-center gap-x-5">
+                    <div className="text-3xl font-bold gap-x-5">
                       {dailyReport?.totalSales}
                       <p className="font-light text-xs md:hidden lg:block xl:hidden">
                         Recipes vs last month
@@ -212,9 +214,9 @@ export function Dashboard() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="mt-5">
-                  <p className="text-sm">Average Sale</p>
+                  <p className="text-sm mb-0 lg:mb-2 xl:mb-0">Average Sale</p>
                   <div className="flex items-center gap-x-3">
-                    <div className="text-3xl font-bold flex items-center gap-x-5">
+                    <div className="text-3xl font-bold  gap-x-5">
                       ${dailyReport?.averageSaleAmount?.toFixed(2)}
                       <p className="font-light text-xs md:hidden lg:block xl:hidden">
                         Average sale vs last month
@@ -247,9 +249,9 @@ export function Dashboard() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="mt-5">
-                  <p className="text-sm">Drink Sold</p>
+                  <p className="text-sm mb-0 lg:mb-2 xl:mb-0">Drink Sold</p>
                   <div className="flex items-center gap-x-3">
-                    <div className="text-3xl font-bold flex items-center gap-x-5">
+                    <div className="text-3xl font-bold gap-x-5">
                       {monthlyBottle}
                       <p className="font-light text-xs md:hidden lg:block xl:hidden">
                         Drinks sold vs last month
@@ -266,12 +268,15 @@ export function Dashboard() {
               </Card>
             </div>
           )}
-          <div className="md:grid space-y-5 md:space-y-0 gap-4 md:gap-8 md:grid-cols-3 xl:grid-cols-5">
-            <div className="col-span-2 md:col-span-3">
+          <div className="md:grid space-y-5 md:space-y-0 gap-4 md:gap-8 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+            <div className="col-span-2 md:col-span-3 lg:col-span-4 xl:col-span-3">
               <SaleRevenueChart />
             </div>
             <div className="md:col-span-3 lg:col-span-2">
               <BottleAmountChart />
+            </div>
+            <div className="hidden lg:block xl:hidden col-span-2">
+              <FixedExpensePieChart />
             </div>
             <div className="col-span-full">
               <DrinkTrend />
