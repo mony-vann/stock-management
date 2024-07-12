@@ -15,6 +15,7 @@ import { MONTHS } from "@/lib/constants";
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
+import { useToast } from "@/components/ui/use-toast";
 import {
   Table,
   TableBody,
@@ -38,19 +39,25 @@ import { postPayroll } from "@/actions/payrollActions";
 // Define types
 type AttendanceLog = {
   timestamp: string;
-  type: string;
+  type: "check-in" | "check-out";
+  minutesDifference: number; // Minutes late for check-in or early leave for check-out
+  minutesEarlyLeave?: number; // New property for early leave check-out
 };
 
 type CheckInMap = {
   [key: number]: {
     status: "check-in" | "permissed" | "absent";
     timestamp?: string;
+    lateHours: number;
+    earlyLeaveHours: number;
   };
 };
 
 type DailyLog = {
   status: "check-in" | "permissed" | "absent";
   date: string;
+  lateHours: number;
+  earlyLeaveHours: number;
 };
 
 type Summary = {
@@ -58,6 +65,9 @@ type Summary = {
   presentDays: number;
   absences: number;
   permissedAbsences: number;
+  earnedSalary: number;
+  totalDeduction: number;
+  netPay: number;
 };
 
 const FormSchema = z.object({
@@ -81,6 +91,7 @@ const Payout: React.FC<PayoutProps> = ({ attendance, staff }) => {
     },
   });
 
+  const { toast } = useToast();
   const [checkinsMap, setCheckinsMap] = useState<CheckInMap>({});
   const [selectedMonth, setSelectedMonth] = useState(
     MONTHS[new Date().getMonth()]
@@ -89,19 +100,52 @@ const Payout: React.FC<PayoutProps> = ({ attendance, staff }) => {
     String(new Date().getFullYear())
   );
   const [summary, setSummary] = useState<Summary>({
-    workingDays: 0,
+    workingDays: 30,
     presentDays: 0,
     absences: 0,
     permissedAbsences: 0,
+    earnedSalary: 0,
+    totalDeduction: 0,
+    netPay: 0,
   });
-  const [hasChanges, setHasChanges] = useState(false);
   const [logs, setLogs] = useState<DailyLog[]>([]);
+  const [workingDaysPerMonth] = useState(28);
+  const [totalDaysInCurrentMonth] = useState(
+    new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).getDate()
+  );
 
-  const monthLength = new Date(
-    Number(selectedYear),
-    MONTHS.indexOf(selectedMonth) + 1,
-    0
-  ).getDate();
+  const calculateNetPay = (
+    baseSalary: number,
+    presentDays: number,
+    permittedDays: number,
+    checkinsMap: CheckInMap
+  ) => {
+    const salaryPerDay = baseSalary / workingDaysPerMonth;
+    const salaryPerHour = salaryPerDay / 7; // Assuming 7-hour workday
+
+    const earnedSalary = (presentDays + permittedDays) * salaryPerDay;
+
+    const totalLateHours = Object.values(checkinsMap).reduce(
+      (total, day) => total + day.lateHours,
+      0
+    );
+    const totalEarlyLeaveHours = Object.values(checkinsMap).reduce(
+      (total, day) => total + day.earlyLeaveHours,
+      0
+    );
+
+    const lateDeduction = totalLateHours * salaryPerHour;
+    const earlyLeaveDeduction = totalEarlyLeaveHours * salaryPerHour;
+
+    const totalDeduction = lateDeduction + earlyLeaveDeduction;
+    const netPay = earnedSalary - totalDeduction;
+
+    return {
+      earnedSalary: parseFloat(earnedSalary.toFixed(2)),
+      totalDeduction: parseFloat(totalDeduction.toFixed(2)),
+      netPay: parseFloat(netPay.toFixed(2)),
+    };
+  };
 
   const updateSummary = (map: CheckInMap) => {
     const presentDays = Object.values(map).filter(
@@ -110,19 +154,30 @@ const Payout: React.FC<PayoutProps> = ({ attendance, staff }) => {
     const permissedDays = Object.values(map).filter(
       (day) => day.status === "permissed"
     ).length;
-    const absences = monthLength - presentDays - permissedDays;
+    const absences = workingDaysPerMonth - presentDays - permissedDays;
+
+    const { earnedSalary, totalDeduction, netPay } = calculateNetPay(
+      staff.salary,
+      presentDays,
+      permissedDays,
+      map
+    );
+
     setSummary({
-      workingDays: monthLength,
+      workingDays: workingDaysPerMonth,
       presentDays,
       absences,
       permissedAbsences: permissedDays,
+      earnedSalary,
+      totalDeduction,
+      netPay,
     });
   };
 
   const updateLogsAndCheckinsMap = (attendanceLogs: AttendanceLog[]) => {
     const newCheckinsMap: CheckInMap = {};
     const newLogs: DailyLog[] = Array.from(
-      { length: monthLength },
+      { length: workingDaysPerMonth },
       (_, index) => {
         const day = index + 1;
         const date = new Date(
@@ -130,18 +185,47 @@ const Payout: React.FC<PayoutProps> = ({ attendance, staff }) => {
           MONTHS.indexOf(selectedMonth),
           day
         );
-        const log = attendanceLogs.find(
-          (l) => new Date(l.timestamp).toDateString() === date.toDateString()
+        const checkInLog = attendanceLogs.find(
+          (l) =>
+            l.type === "check-in" &&
+            new Date(l.timestamp).toDateString() === date.toDateString()
+        );
+        const checkOutLog = attendanceLogs.find(
+          (l) =>
+            l.type === "check-out" &&
+            new Date(l.timestamp).toDateString() === date.toDateString()
         );
 
-        if (log) {
+        if (checkInLog || checkOutLog) {
+          const lateHours = checkInLog
+            ? checkInLog.minutesDifference > 0
+              ? checkInLog.minutesDifference / 60
+              : 0
+            : 0;
+          const earlyLeaveHours = checkOutLog
+            ? checkOutLog.minutesDifference > 0
+              ? checkOutLog.minutesDifference / 60
+              : 0
+            : 0;
           newCheckinsMap[day] = {
             status: "check-in",
-            timestamp: log.timestamp,
+            timestamp: checkInLog?.timestamp || checkOutLog?.timestamp,
+            lateHours,
+            earlyLeaveHours,
           };
-          return { status: "check-in", date: log.timestamp };
+          return {
+            status: "check-in",
+            date: checkInLog?.timestamp || checkOutLog?.timestamp || "",
+            lateHours,
+            earlyLeaveHours,
+          };
         }
-        return { status: "absent", date: date.toISOString() };
+        return {
+          status: "absent",
+          date: date.toISOString(),
+          lateHours: 0,
+          earlyLeaveHours: 0,
+        };
       }
     );
 
@@ -163,7 +247,7 @@ const Payout: React.FC<PayoutProps> = ({ attendance, staff }) => {
     setCheckinsMap((prev) => {
       const newMap = { ...prev };
       if (!newMap[day] || newMap[day].status === "absent") {
-        newMap[day] = { status: "permissed" };
+        newMap[day] = { status: "permissed", lateHours: 0, earlyLeaveHours: 0 };
       } else if (newMap[day].status === "permissed") {
         delete newMap[day]; // This effectively sets it to 'absent'
       } else if (newMap[day].status === "check-in") {
@@ -171,15 +255,14 @@ const Payout: React.FC<PayoutProps> = ({ attendance, staff }) => {
         return prev;
       }
 
-      // Update logs
       setLogs((prevLogs) =>
-        prevLogs.map((log) => {
-          //   if (log.day === day) {
-          return {
-            ...log,
-            status: newMap[day] ? newMap[day].status : "absent",
-          };
-          //   }
+        prevLogs.map((log, index) => {
+          if (index === day - 1) {
+            return {
+              ...log,
+              status: newMap[day] ? newMap[day].status : "absent",
+            };
+          }
           return log;
         })
       );
@@ -187,23 +270,35 @@ const Payout: React.FC<PayoutProps> = ({ attendance, staff }) => {
       updateSummary(newMap);
       return newMap;
     });
-    setHasChanges(true);
   };
 
   const handleCalculatePayout = async () => {
     const data = {
       id: staff.id,
       logs,
-      amount: staff.salary,
+      amount: summary.netPay,
       present_days: summary.presentDays,
       absent_days: summary.absences,
+      earned: summary.earnedSalary,
+      deductions: summary.totalDeduction,
       permitted_days: summary.permissedAbsences,
       type: "salary",
     };
 
     try {
       const response = await postPayroll(data);
-      console.log(response);
+      if (response) {
+        toast({
+          title: "Payout successful",
+          description: "Payout has been processed successfully",
+        });
+      } else {
+        toast({
+          title: "Payout failed",
+          description:
+            "Payout already exists for the selected month or Not enough data to process payout.",
+        });
+      }
     } catch (error) {
       console.error("Error creating payroll:", error);
     }
@@ -215,154 +310,218 @@ const Payout: React.FC<PayoutProps> = ({ attendance, staff }) => {
         Pay
         <MoveRight size={20} className="ml-2" />
       </DialogTrigger>
-      <DialogContent className="max-w-3xl">
+      <DialogContent className="max-w-7xl">
         <DialogHeader>
-          <DialogTitle>Payment</DialogTitle>
-          <DialogDescription>
-            Manage attendance and calculate payout
-          </DialogDescription>
-        </DialogHeader>
-        <Form {...form}>
-          <form>
-            <div className="flex items-center gap-x-3 mb-4">
-              <FormField
-                control={form.control}
-                name="month"
-                render={({ field }) => (
-                  <FormItem className="w-2/4">
-                    <Select
-                      onValueChange={(value) => {
-                        field.onChange(value);
-                        setSelectedMonth(value);
-                      }}
-                      value={field.value}
-                    >
-                      <FormControl>
-                        <SelectTrigger className="w-full">
-                          <SelectValue placeholder="month" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {MONTHS.map((month) => (
-                          <SelectItem key={month} value={month}>
-                            {month}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="year"
-                render={({ field }) => (
-                  <FormItem className="w-1/2">
-                    <Select
-                      onValueChange={(value) => {
-                        field.onChange(value);
-                        setSelectedYear(value);
-                      }}
-                      value={field.value}
-                    >
-                      <FormControl>
-                        <SelectTrigger className="w-full">
-                          <SelectValue placeholder="year" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent className="w-[100px]">
-                        {Array.from(
-                          { length: 2030 - 2024 + 1 },
-                          (_, i) => i + 2024
-                        ).map((year) => (
-                          <SelectItem key={year} value={String(year)}>
-                            {year}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </FormItem>
-                )}
-              />
+          <div className="flex items-start justify-between">
+            <div>
+              <DialogTitle>Payment</DialogTitle>
+              <DialogDescription>
+                Calculate the payout for the selected month
+              </DialogDescription>
             </div>
-          </form>
-        </Form>
-
-        <div className="bg-gray-100 p-4 rounded-md mb-4">
-          <h3 className="font-bold mb-2">Summary</h3>
-          <p>Working Days: {summary.workingDays}</p>
-          <p>Present Days: {summary.presentDays}</p>
-          <p>Absences: {summary.absences}</p>
-          <p>Permissed Absences: {summary.permissedAbsences}</p>
-          <p>Salary: {staff.salary}</p>
-        </div>
-
-        <div className="max-h-[400px] overflow-y-scroll">
-          {Object.keys(checkinsMap).length === 0 ? (
-            <Alert>
-              <AlertTitle>No logs found</AlertTitle>
-              <AlertDescription>
-                There are no logs found for the selected period.
-              </AlertDescription>
-            </Alert>
-          ) : (
+            <Form {...form}>
+              <form>
+                <div className="flex items-center gap-x-3 mb-4 mr-10">
+                  <FormField
+                    control={form.control}
+                    name="month"
+                    render={({ field }) => (
+                      <FormItem className="w-2/4">
+                        <Select
+                          onValueChange={(value) => {
+                            field.onChange(value);
+                            setSelectedMonth(value);
+                          }}
+                          value={field.value}
+                        >
+                          <FormControl>
+                            <SelectTrigger className="w-full">
+                              <SelectValue placeholder="month" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {MONTHS.map((month) => (
+                              <SelectItem key={month} value={month}>
+                                {month}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="year"
+                    render={({ field }) => (
+                      <FormItem className="w-1/2">
+                        <Select
+                          onValueChange={(value) => {
+                            field.onChange(value);
+                            setSelectedYear(value);
+                          }}
+                          value={field.value}
+                        >
+                          <FormControl>
+                            <SelectTrigger className="w-full">
+                              <SelectValue placeholder="year" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent className="w-[100px]">
+                            {Array.from(
+                              { length: 2030 - 2024 + 1 },
+                              (_, i) => i + 2024
+                            ).map((year) => (
+                              <SelectItem key={year} value={String(year)}>
+                                {year}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              </form>
+            </Form>
+          </div>
+        </DialogHeader>
+        <div className="grid grid-cols-2 gap-x-10 mt-5">
+          <div>
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Date</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Permissed</TableHead>
+                  <TableHead className="font-medium">Item</TableHead>
+                  <TableHead className="font-medium w-[200px]">Value</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {Array.from({ length: monthLength }, (_, i) => i + 1)
-                  .reverse()
-                  .map((day) => {
-                    const checkIn = checkinsMap[day];
-                    const status = checkIn ? checkIn.status : "absent";
-                    return (
-                      <TableRow key={day}>
-                        <TableCell>{`${selectedYear}-${(
-                          MONTHS.indexOf(selectedMonth) + 1
-                        )
-                          .toString()
-                          .padStart(2, "0")}-${day
-                          .toString()
-                          .padStart(2, "0")}`}</TableCell>
-                        <TableCell className="w-[200px]">
-                          {status === "check-in" && (
-                            <Badge className="rounded-md bg-primary hover:bg-green-primary pointer-events-none">
-                              check-in
-                            </Badge>
-                          )}
-                          {status === "permissed" && (
-                            <Badge className="rounded-md bg-yellow-400 hover:bg-yellow-700 pointer-events-none">
-                              permissed
-                            </Badge>
-                          )}
-                          {status === "absent" && (
-                            <Badge className="rounded-md bg-red-600 hover:bg-red-600 pointer-events-none">
-                              absent
-                            </Badge>
-                          )}
-                        </TableCell>
-                        <TableCell>
-                          <Checkbox
-                            checked={
-                              status === "permissed" || status === "check-in"
-                            }
-                            onCheckedChange={() => handleStatusChange(day)}
-                            disabled={checkIn && checkIn.status === "check-in"}
-                          />
-                        </TableCell>
-                      </TableRow>
-                    );
-                  })}
+                <TableRow>
+                  <TableCell>Base Salary</TableCell>
+                  <TableCell>${staff.salary}</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell>Working Days per Month</TableCell>
+                  <TableCell>{workingDaysPerMonth}</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell>Present Days</TableCell>
+                  <TableCell>{summary.presentDays}</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell>Absences</TableCell>
+                  <TableCell>{summary.absences}</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell>Permissed Absences</TableCell>
+                  <TableCell>{summary.permissedAbsences}</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell>Earned Salary</TableCell>
+                  <TableCell>${summary.earnedSalary}</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell>Total Deduction</TableCell>
+                  <TableCell>${summary.totalDeduction}</TableCell>
+                </TableRow>
+                <TableRow className="bg-gray-100 hover:bg-gray-100">
+                  <TableCell>Net Pay</TableCell>
+                  <TableCell>${summary.netPay}</TableCell>
+                </TableRow>
               </TableBody>
             </Table>
-          )}
+          </div>
+          <div className="">
+            {Object.keys(checkinsMap).length === 0 ? (
+              <Alert>
+                <AlertTitle>No logs found</AlertTitle>
+                <AlertDescription>
+                  There are no logs found for the selected period.
+                </AlertDescription>
+              </Alert>
+            ) : (
+              <div className="h-[500px] relative overflow-auto">
+                <Table>
+                  <TableHeader className="sticky top-0 bg-white z-10">
+                    <TableRow>
+                      <TableHead>Date</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead>Permissed</TableHead>
+                      <TableHead>Late Hour</TableHead>
+                      <TableHead>Early Leave</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {Array.from(
+                      { length: totalDaysInCurrentMonth },
+                      (_, i) => i + 1
+                    )
+                      .reverse()
+                      .map((day) => {
+                        const checkIn = checkinsMap[day];
+                        const status = checkIn ? checkIn.status : "absent";
+                        return (
+                          <TableRow key={day}>
+                            <TableCell>{`${selectedYear}-${(
+                              MONTHS.indexOf(selectedMonth) + 1
+                            )
+                              .toString()
+                              .padStart(2, "0")}-${day
+                              .toString()
+                              .padStart(2, "0")}`}</TableCell>
+                            <TableCell className="w-[120px]">
+                              {status === "check-in" && (
+                                <Badge
+                                  variant={"outline"}
+                                  className="capitalize"
+                                >
+                                  check-in
+                                </Badge>
+                              )}
+                              {status === "permissed" && (
+                                <Badge className="bg-yellow-400 hover:bg-yellow-700 pointer-events-none capitalize">
+                                  permissed
+                                </Badge>
+                              )}
+                              {status === "absent" && (
+                                <Badge className="bg-red-600 hover:bg-red-600 pointer-events-none capitalize">
+                                  absent
+                                </Badge>
+                              )}
+                            </TableCell>
+                            <TableCell>
+                              <Checkbox
+                                checked={
+                                  status === "permissed" ||
+                                  status === "check-in"
+                                }
+                                onCheckedChange={() => handleStatusChange(day)}
+                                disabled={
+                                  checkIn && checkIn.status === "check-in"
+                                }
+                              />
+                            </TableCell>
+                            <TableCell>
+                              {checkIn && checkIn.lateHours > 0
+                                ? "$" + checkIn.lateHours.toFixed(2)
+                                : "-"}
+                            </TableCell>
+                            <TableCell>
+                              {checkIn && checkIn.earlyLeaveHours > 0
+                                ? "$" + checkIn.earlyLeaveHours.toFixed(2)
+                                : "-"}
+                            </TableCell>
+                          </TableRow>
+                        );
+                      })}
+                  </TableBody>
+                </Table>
+              </div>
+            )}
+          </div>
         </div>
         <div className="flex justify-end gap-2 mt-4">
+          <Button variant={"outline"}>Export</Button>
           <Button
             onClick={handleCalculatePayout}
             className="bg-primary hover:bg-primary-700"

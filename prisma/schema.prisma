@@ -149,8 +149,10 @@ model Shift {
 }
 
 type Log {
-  date   DateTime
-  status String
+  date            DateTime
+  status          String
+  earlyLeaveHours Float
+  lateHours       Float
 }
 
 model Payroll {
@@ -162,6 +164,8 @@ model Payroll {
   permitted_days Int
   logs           Log[]
   amount         Float
+  earned         Float
+  deductions     Float
   timestamp      DateTime
   type           String   @default("salary")
 }

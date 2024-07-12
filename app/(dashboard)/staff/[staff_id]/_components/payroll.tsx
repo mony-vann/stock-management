@@ -39,7 +39,7 @@ const Payroll = ({ payrolls, attendance, staff }: any) => {
         <div className="flex items-center justify-between w-full">
           <div className="flex items-center gap-x-2">
             <CardTitle>Payrolls ({payrolls.length})</CardTitle>
-            <Badge className="rounded-md">{paymentStatus}</Badge>
+            <Badge variant={"outline"}>{paymentStatus}</Badge>
           </div>
           <div>
             <Payout attendance={attendance} staff={staff} />
@@ -60,7 +60,9 @@ const Payroll = ({ payrolls, attendance, staff }: any) => {
             <TableHeader>
               <TableRow>
                 <TableHead>Type</TableHead>
-                <TableHead>Amount</TableHead>
+                <TableHead>Net Pay</TableHead>
+                <TableHead>Base Salary</TableHead>
+                <TableHead>Deduction</TableHead>
                 <TableHead>Date</TableHead>
               </TableRow>
             </TableHeader>
@@ -73,9 +75,11 @@ const Payroll = ({ payrolls, attendance, staff }: any) => {
                       {payroll.type}
                     </Badge>
                   </TableCell>
-                  <TableCell>{payroll.amount}</TableCell>
+                  <TableCell>${payroll.amount}</TableCell>
+                  <TableCell>${payroll.earned}</TableCell>
+                  <TableCell>${payroll.deductions}</TableCell>
                   <TableCell>
-                    {new Date(payroll.timestamp).toLocaleDateString()}
+                    {new Date(payroll.timestamp).toISOString().split("T")[0]}
                   </TableCell>
                 </TableRow>
               ))}

@@ -120,7 +120,7 @@ const AttendanceTracking = ({
             </CardContent>
           </Card>
         </div>
-        <div className="md:col-span-2 xl:col-span-3 -mt-[245px]">
+        <div className="md:col-span-2 xl:col-span-3 -mt-[265px]">
           <Card className="rounded-3xl">
             <CardHeader>
               <CardTitle>Recent Attendance Logs ({logss.length})</CardTitle>
@@ -155,7 +155,7 @@ const AttendanceTracking = ({
                               {log.employeeName}
                             </div>
                             <div className="text-sm text-muted-foreground">
-                              {staffss[index].shift || "Shift"}
+                              {staffss[index]?.shift || "Shift"}
                             </div>
                           </TableCell>
                           <TableCell>
