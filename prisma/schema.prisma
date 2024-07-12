@@ -138,7 +138,7 @@ model Attendance {
   type              String   @default("check-in")
   reason            String?
   status            String   @default("on-time")
-  minutesDifference Int
+  minutesDifference Int?
 }
 
 model Shift {

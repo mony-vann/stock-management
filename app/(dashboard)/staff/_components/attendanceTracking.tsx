@@ -155,7 +155,7 @@ const AttendanceTracking = ({
                               {log.employeeName}
                             </div>
                             <div className="text-sm text-muted-foreground">
-                              {staffss[index].shift}
+                              {staffss[index].shift || "Shift"}
                             </div>
                           </TableCell>
                           <TableCell>
