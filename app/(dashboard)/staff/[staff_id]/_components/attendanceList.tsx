@@ -110,7 +110,7 @@ const AttendanceList = ({ attendance, staffId }: any) => {
   };
 
   return (
-    <Card className="col-span-full">
+    <Card className="col-span-full rounded-3xl">
       <CardHeader>
         <div className="w-full flex items-center justify-between">
           <CardTitle className="w-full">Attendance</CardTitle>

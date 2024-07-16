@@ -11,7 +11,7 @@ import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 const StaffDetail = ({ payrolls, staff, attendance, shifts }: any) => {
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3  mt-5">
-      <Card className="w-full bg-cover bg-center rounded-lg overflow-hidden ">
+      <Card className="w-full bg-cover bg-center rounded-3xl overflow-hidden ">
         <CardHeader className="bg-primary text-primary-foreground p-6">
           <div className="flex items-center gap-4">
             <Avatar className="w-16 h-16">

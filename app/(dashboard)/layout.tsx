@@ -4,6 +4,7 @@ import { auth } from "@clerk/nextjs/server";
 import { db } from "@/lib/db";
 
 import { redirect } from "next/navigation";
+import MobileSidebar from "@/components/MobileSidebar";
 
 export default async function DashboardLayout({
   children,
@@ -30,6 +31,7 @@ export default async function DashboardLayout({
   return (
     <>
       <Sidebar />
+      <MobileSidebar />
       {children}
     </>
   );

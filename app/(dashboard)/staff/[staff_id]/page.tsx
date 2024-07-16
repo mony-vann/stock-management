@@ -25,7 +25,7 @@ const StaffDetailPage = async ({
             <h1 className="text-2xl font-semibold leading-none tracking-tight text-tremor-content-strong dark:text-dark-tremor-content-strong">
               {staff && staff.name} Details
             </h1>
-            <p className="mt-1 text-tremor-default text-tremor-content dark:text-dark-tremor-content">
+            <p className="mt-1 text-tremor-default text-tremor-content dark:text-dark-tremor-content hidden md:block">
               This is an overview of {staff && staff.name}'s attendance and
               payroll.
             </p>

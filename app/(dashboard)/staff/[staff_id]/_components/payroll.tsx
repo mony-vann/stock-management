@@ -34,7 +34,7 @@ const Payroll = ({ payrolls, attendance, staff }: any) => {
 
   const paymentStatus = isPaid ? "Paid" : "Unpaid";
   return (
-    <Card className="w-full md:col-span-1 lg:col-span-2 2xl:col-span-2">
+    <Card className="w-full md:col-span-1 lg:col-span-2 2xl:col-span-2 rounded-3xl">
       <CardHeader>
         <div className="flex items-center justify-between w-full">
           <div className="flex items-center gap-x-2">
