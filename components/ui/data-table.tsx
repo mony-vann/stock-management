@@ -44,8 +44,8 @@ interface DataTableProps<TData, TValue> {
 export function DataTable<TData, TValue>({
   columns,
   data,
-  // loading = true,
-}: DataTableProps<TData, TValue>) {
+}: // loading = true,
+DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [search, setSearch] = React.useState<string>("");
   const [loading, setLoading] = React.useState<boolean>(false);
@@ -66,7 +66,7 @@ export function DataTable<TData, TValue>({
   });
 
   return (
-    <div className="w-[330px] md:w-full">
+    <div className="md:w-full">
       <div className="relative mb-5">
         <Search className="absolute left-2.5 top-3 h-4 w-4 text-muted-foreground" />
         <Input
@@ -77,7 +77,7 @@ export function DataTable<TData, TValue>({
           className="w-full h-10 rounded-lg bg-background pl-8 md:w-[200px] lg:w-[336px]"
         />
       </div>
-      <div className="rounded-md border">
+      <div className="rounded-md border w-full overflow-auto">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -89,7 +89,7 @@ export function DataTable<TData, TValue>({
                         ? null
                         : flexRender(
                             header.column.columnDef.header,
-                            header.getContext(),
+                            header.getContext()
                           )}
                     </TableHead>
                   );
@@ -108,7 +108,7 @@ export function DataTable<TData, TValue>({
                     <TableCell key={cell.id}>
                       {flexRender(
                         cell.column.columnDef.cell,
-                        cell.getContext(),
+                        cell.getContext()
                       )}
                     </TableCell>
                   ))}
@@ -150,7 +150,7 @@ export function DataTable<TData, TValue>({
             {Math.min(
               (table.getState().pagination.pageIndex + 1) *
                 table.getState().pagination.pageSize,
-              table.getFilteredRowModel().rows.length,
+              table.getFilteredRowModel().rows.length
             )}
           </strong>{" "}
           of <strong>{table.getFilteredRowModel().rows.length}</strong> products

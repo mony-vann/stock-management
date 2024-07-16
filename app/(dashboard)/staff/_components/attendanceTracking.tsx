@@ -68,7 +68,7 @@ const AttendanceTracking = ({
   }, []);
   return (
     <>
-      <div className="absolute right-10 top-20">
+      <div className="hidden md:block absolute right-10 top-20">
         <h1 className="text-xl font-bold ">
           Last updated: {lastUpdated.toLocaleTimeString()}
         </h1>
@@ -79,7 +79,7 @@ const AttendanceTracking = ({
         staffWithMostLates={staffWithMostLatess}
         staffWithMostEarlyLeaves={staffWithMostEarlyLeavess}
       />
-      <div className="grid gap-4 md:gap-4 md:grid-cols-3 xl:grid-cols-5 mt-5">
+      <div className="lg:grid gap-4 md:gap-4 md:grid-cols-3 xl:grid-cols-5 mt-5">
         <div className="xl:col-span-2">
           <Card className="rounded-3xl">
             <CardHeader>
@@ -120,7 +120,7 @@ const AttendanceTracking = ({
             </CardContent>
           </Card>
         </div>
-        <div className="md:col-span-2 xl:col-span-3 -mt-[265px]">
+        <div className="md:col-span-2 xl:col-span-3 mt-5 lg:mt-0 xl:-mt-[265px]">
           <Card className="rounded-3xl">
             <CardHeader>
               <CardTitle>Recent Attendance Logs ({logss.length})</CardTitle>
@@ -160,15 +160,17 @@ const AttendanceTracking = ({
                               </div>
                             </TableCell>
                             <TableCell>
-                              <p className="capitalize">{log.type}</p>
+                              <p className="capitalize whitespace-nowrap">
+                                {log.type}
+                              </p>
                             </TableCell>
                             <TableCell>
                               {log.status === "on-time" ? (
-                                <Badge className="capitalize hover:bg-primary pointer-events-none">
+                                <Badge className="capitalize hover:bg-primary pointer-events-none whitespace-nowrap">
                                   {log.status}
                                 </Badge>
                               ) : (
-                                <Badge className="capitalize bg-red-500 hover:bg-red-500 pointer-events-none">
+                                <Badge className="capitalize bg-red-500 hover:bg-red-500 pointer-events-none whitespace-nowrap">
                                   {log.status}
                                 </Badge>
                               )}
@@ -189,7 +191,7 @@ const AttendanceTracking = ({
                                   .split("T")[0]
                               }
                             </TableCell>
-                            <TableCell>
+                            <TableCell className="whitespace-nowrap">
                               {new Date(
                                 log.timestamp - 7 * 60 * 60 * 1000
                               ).toLocaleTimeString([], {

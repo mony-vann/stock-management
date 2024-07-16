@@ -41,7 +41,7 @@ const SummaryCards = ({
   );
 
   return (
-    <div className="grid gap-4 md:grid-cols-5 md:gap-4">
+    <div className="md:grid gap-4 grid-cols-2 xl:grid-cols-5 md:gap-4">
       <div className="space-y-4">
         <Card className="rounded-3xl flex items-center p-5 gap-x-5">
           <Button disabled className="rounded-xl w-16 h-16 bg-[#0565ff40]">
@@ -53,7 +53,7 @@ const SummaryCards = ({
               <div className="text-3xl font-bold flex items-center gap-x-5">
                 {totalStaffs.length}
               </div>
-              <div className="font-light text-xs hidden md:block lg:hidden xl:block">
+              <div className="font-light text-xs block lg:hidden xl:block">
                 <p className="leading-3">
                   {sexCountTotal.male} male, {sexCountTotal.female} female
                 </p>
@@ -71,7 +71,7 @@ const SummaryCards = ({
               <div className="text-xl font-bold flex items-center gap-x-5">
                 {staffWithMostLates?.name || "No staff"}
               </div>
-              <div className="font-light text-xs hidden md:block lg:hidden xl:block">
+              <div className="font-light text-xs block lg:hidden xl:block">
                 <p className="leading-3">
                   with {staffWithMostLates?.lateCount || 0} lates
                 </p>
@@ -80,7 +80,7 @@ const SummaryCards = ({
           </div>
         </Card>
       </div>
-      <div className="space-y-4">
+      <div className="space-y-4 mt-4 md:mt-0">
         <Card className="rounded-3xl flex items-start p-5 gap-x-5">
           <Button disabled className="rounded-xl w-16 h-16 bg-[#0565ff40]">
             <Activity className="h-10 w-10 text-[#0565ff]" />
@@ -91,7 +91,7 @@ const SummaryCards = ({
               <div className="text-3xl font-bold flex items-center gap-x-5">
                 {activeStaffs.length}
               </div>
-              <div className="font-light text-xs hidden md:block lg:hidden xl:block">
+              <div className="font-light text-xs block lg:hidden xl:block">
                 <p className="leading-3">
                   {roleCountActive.barista} Barista(s)
                 </p>
@@ -109,7 +109,7 @@ const SummaryCards = ({
               <div className="text-xl font-bold flex items-center gap-x-5">
                 {staffWithMostEarlyLeaves?.name || "No staff"}
               </div>
-              <div className="font-light text-xs hidden md:block lg:hidden xl:block">
+              <div className="font-light text-xs block lg:hidden xl:block">
                 <p className="leading-3">
                   with {staffWithMostEarlyLeaves?.earlyLeaveCount || 0} earlys
                 </p>
