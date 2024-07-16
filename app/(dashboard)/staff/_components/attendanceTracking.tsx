@@ -42,7 +42,6 @@ const AttendanceTracking = ({
   const [lastUpdated, setLastUpdated] = useState(new Date(lastUpdatedTime));
 
   useEffect(() => {
-    console.log(staffWithMostEarlyLeaves);
     const intervalId = setInterval(async () => {
       const {
         recentAttendanceLogs,
@@ -100,18 +99,19 @@ const AttendanceTracking = ({
               ) : (
                 <div className="space-y-2 mx-h-[350px] overflow-y-auto">
                   {activeStaffss.map((staff: any) => (
-                    <Alert key={staff.name}>
+                    <Alert key={staff.name} className="rounded-xl">
                       <AlertTitle className="flex items-center justify-between gap-x-2">
                         {staff.name}
-                        <Badge className="rounded-md" variant={"outline"}>
-                          {staff.role}
-                        </Badge>
+                        <Badge variant={"outline"}>{staff.role}</Badge>
                       </AlertTitle>
                       <AlertDescription>
                         Checked in at {""}
                         {new Date(
-                          new Date(staff.timestamp).setHours(-1)
-                        ).toLocaleTimeString()}
+                          staff.timestamp - 7 * 60 * 60 * 1000
+                        ).toLocaleTimeString([], {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
                       </AlertDescription>
                     </Alert>
                   ))}
@@ -126,7 +126,7 @@ const AttendanceTracking = ({
               <CardTitle>Recent Attendance Logs ({logss.length})</CardTitle>
               <CardDescription>A list of recent logs for today</CardDescription>
             </CardHeader>
-            <CardContent className="min-h-[343px] max-h-[620px] overflow-y-auto">
+            <CardContent>
               {logss.length === 0 ? (
                 <Alert>
                   <AlertTitle>No logs found</AlertTitle>
@@ -135,69 +135,74 @@ const AttendanceTracking = ({
                   </AlertDescription>
                 </Alert>
               ) : (
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead className="w-[200px]">Name</TableHead>
-                      <TableHead>Type</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead>Minutes</TableHead>
-                      <TableHead>Date</TableHead>
-                      <TableHead>Time</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {logss.map((log: any, index: number) => {
-                      return (
-                        <TableRow key={log.timestamp}>
-                          <TableCell>
-                            <div className="font-medium">
-                              {log.employeeName}
-                            </div>
-                            <div className="text-sm text-muted-foreground">
-                              {staffss[index]?.shift || "Shift"}
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            <p className="capitalize">{log.type}</p>
-                          </TableCell>
-                          <TableCell>
-                            {log.status === "on-time" ? (
-                              <Badge className="capitalize rounded-md hover:bg-primary pointer-events-none">
-                                {log.status}
-                              </Badge>
-                            ) : (
-                              <Badge className="capitalize rounded-md bg-red-500 hover:bg-red-500 pointer-events-none">
-                                {log.status}
-                              </Badge>
-                            )}
-                          </TableCell>
-                          <TableCell>
-                            {log.minutesDiff > 0
-                              ? log.minutesDiff > 60
-                                ? `${Math.floor(log.minutesDiff / 60)}h ${
-                                    log.minutesDiff % 60
-                                  }m`
-                                : `${log.minutesDiff}m`
-                              : "-"}
-                          </TableCell>
-                          <TableCell>
-                            {
-                              new Date(new Date(log.timestamp).setHours(-1))
-                                .toISOString()
-                                .split("T")[0]
-                            }
-                          </TableCell>
-                          <TableCell>
-                            {new Date(
-                              new Date(log.timestamp).setHours(-1)
-                            ).toLocaleTimeString()}
-                          </TableCell>
-                        </TableRow>
-                      );
-                    })}
-                  </TableBody>
-                </Table>
+                <div className="min-h-[343px] max-h-[620px] relative overflow-auto">
+                  <Table>
+                    <TableHeader className="top-0 sticky bg-white">
+                      <TableRow>
+                        <TableHead className="w-[200px]">Name</TableHead>
+                        <TableHead>Type</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead>Minutes</TableHead>
+                        <TableHead>Date</TableHead>
+                        <TableHead>Time</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {logss.map((log: any) => {
+                        return (
+                          <TableRow key={log.timestamp}>
+                            <TableCell>
+                              <div className="font-medium">
+                                {log.employeeName}
+                              </div>
+                              <div className="text-sm text-muted-foreground">
+                                {log.shift || "Shift"}
+                              </div>
+                            </TableCell>
+                            <TableCell>
+                              <p className="capitalize">{log.type}</p>
+                            </TableCell>
+                            <TableCell>
+                              {log.status === "on-time" ? (
+                                <Badge className="capitalize hover:bg-primary pointer-events-none">
+                                  {log.status}
+                                </Badge>
+                              ) : (
+                                <Badge className="capitalize bg-red-500 hover:bg-red-500 pointer-events-none">
+                                  {log.status}
+                                </Badge>
+                              )}
+                            </TableCell>
+                            <TableCell>
+                              {log.minutesDiff > 0
+                                ? log.minutesDiff > 60
+                                  ? `${Math.floor(log.minutesDiff / 60)}h ${
+                                      log.minutesDiff % 60
+                                    }m`
+                                  : `${log.minutesDiff}m`
+                                : "-"}
+                            </TableCell>
+                            <TableCell>
+                              {
+                                new Date(log.timestamp)
+                                  .toISOString()
+                                  .split("T")[0]
+                              }
+                            </TableCell>
+                            <TableCell>
+                              {new Date(
+                                log.timestamp - 7 * 60 * 60 * 1000
+                              ).toLocaleTimeString([], {
+                                hour: "2-digit",
+                                minute: "2-digit",
+                              })}
+                            </TableCell>
+                          </TableRow>
+                        );
+                      })}
+                    </TableBody>
+                  </Table>
+                </div>
               )}
             </CardContent>
           </Card>

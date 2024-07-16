@@ -123,6 +123,7 @@ export const pinCheck = async (data: any) => {
         status = "late";
       } else {
         status = "on-time";
+        minutesDiff = 0;
       }
     }
 
@@ -133,6 +134,7 @@ export const pinCheck = async (data: any) => {
         minutesDiff = Math.abs(minutesDiff); // Make minutesDiff positive for early check-outs
       } else {
         status = "on-time";
+        minutesDiff = 0;
       }
     }
 

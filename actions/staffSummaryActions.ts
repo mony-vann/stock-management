@@ -23,17 +23,27 @@ export const getAttendanceData = async () => {
     },
   });
 
+  const shifts = await db.shift.findMany();
+
+  attendanceLogs.forEach((log) => {
+    const shift = shifts.find((shift) => shift.id === log.employee.shift);
+    if (shift) {
+      log.employee.shift = shift.name;
+    }
+  });
+
   const recentAttendanceLogs = attendanceLogs
     .map((log) => {
       return {
         employeeName: log.employee.name,
-        timestamp: log.timestamp.toISOString(), // Send as ISO string
+        shift: log.employee.shift,
+        timestamp: log.timestamp,
         type: log.type,
         status: log.status,
         minutesDiff: log.minutesDifference,
       };
     })
-    .slice(0, 30);
+    .slice(0, 50);
 
   const groupedLogs = attendanceLogs.reduce((acc, log) => {
     const name = log.employee.name;
