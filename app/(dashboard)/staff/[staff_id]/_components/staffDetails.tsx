@@ -10,7 +10,7 @@ import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 
 const StaffDetail = ({ payrolls, staff, attendance, shifts }: any) => {
   return (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3  mt-5">
+    <div className="md:grid gap-4 md:grid-cols-2 lg:grid-cols-3 mt-5 space-y-4 md:space-y-0">
       <Card className="w-full bg-cover bg-center rounded-3xl overflow-hidden ">
         <CardHeader className="bg-primary text-primary-foreground p-6">
           <div className="flex items-center gap-4">

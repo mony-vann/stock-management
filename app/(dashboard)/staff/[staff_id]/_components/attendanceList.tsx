@@ -112,9 +112,9 @@ const AttendanceList = ({ attendance, staffId }: any) => {
   return (
     <Card className="col-span-full rounded-3xl">
       <CardHeader>
-        <div className="w-full flex items-center justify-between">
+        <div className="w-full md:flex items-center justify-between">
           <CardTitle className="w-full">Attendance</CardTitle>
-          <div className="w-full flex justify-end">
+          <div className="w-full flex md:justify-end mt-2 md:mt-0">
             <Form {...form}>
               <form
                 onSubmit={form.handleSubmit(onSubmit)}
@@ -184,7 +184,9 @@ const AttendanceList = ({ attendance, staffId }: any) => {
             </Form>
           </div>
         </div>
-        <CardDescription>A list of recent logs the month</CardDescription>
+        <CardDescription className="hidden md:block">
+          A list of recent logs the month
+        </CardDescription>
       </CardHeader>{" "}
       <CardContent>
         {Object.keys(checkinsMap).length === 0 ? (

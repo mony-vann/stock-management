@@ -153,7 +153,7 @@ DataTableProps<TData, TValue>) {
               table.getFilteredRowModel().rows.length
             )}
           </strong>{" "}
-          of <strong>{table.getFilteredRowModel().rows.length}</strong> products
+          of <strong>{table.getFilteredRowModel().rows.length}</strong> people
         </div>
         <div className="flex items-center space-x-6 lg:space-x-8">
           <div className="flex items-center space-x-2 ">

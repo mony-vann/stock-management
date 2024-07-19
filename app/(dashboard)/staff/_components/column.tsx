@@ -22,7 +22,12 @@ export const columns: ColumnDef<StaffColumn>[] = [
     header: "Name",
     cell: ({ row }) => {
       return (
-        <Link href={`/staff/${row.original.id}`}>{row.original.name}</Link>
+        <Link
+          href={`/staff/${row.original.id}`}
+          className="hover:text-blue-500"
+        >
+          {row.original.name}
+        </Link>
       );
     },
   },

@@ -310,10 +310,10 @@ const Payout: React.FC<PayoutProps> = ({ attendance, staff }) => {
         Pay
         <MoveRight size={20} className="ml-2" />
       </DialogTrigger>
-      <DialogContent className="max-w-7xl">
+      <DialogContent className="md:max-w-7xl max-h-screen ">
         <DialogHeader>
           <div className="flex items-start justify-between">
-            <div>
+            <div className="text-left">
               <DialogTitle>Payment</DialogTitle>
               <DialogDescription>
                 Calculate the payout for the selected month
@@ -386,9 +386,9 @@ const Payout: React.FC<PayoutProps> = ({ attendance, staff }) => {
             </Form>
           </div>
         </DialogHeader>
-        <div className="grid grid-cols-2 gap-x-10 mt-5">
+        <div className="md:grid grid-cols-2 gap-x-10 mt-5 space-y-8 md:space-y-0">
           <div>
-            <Table>
+            <Table className="w-[90%] md:w-full">
               <TableHeader>
                 <TableRow>
                   <TableHead className="font-medium">Item</TableHead>
@@ -431,7 +431,7 @@ const Payout: React.FC<PayoutProps> = ({ attendance, staff }) => {
               </TableBody>
             </Table>
           </div>
-          <div className="">
+          <div className="w-[90%] md:w-full">
             {Object.keys(checkinsMap).length === 0 ? (
               <Alert>
                 <AlertTitle>No logs found</AlertTitle>
@@ -446,7 +446,7 @@ const Payout: React.FC<PayoutProps> = ({ attendance, staff }) => {
                     <TableRow>
                       <TableHead>Date</TableHead>
                       <TableHead>Status</TableHead>
-                      <TableHead>Permissed</TableHead>
+                      <TableHead>Allow</TableHead>
                       <TableHead>Late Hour</TableHead>
                       <TableHead>Early Leave</TableHead>
                     </TableRow>
