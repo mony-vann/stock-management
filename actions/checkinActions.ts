@@ -57,6 +57,22 @@ function minutesDifference(date1: Date, date2: Date): number {
   return Math.round(timeDiff / 60000);
 }
 
+async function createCheckoutRecord(employeeId: string, lastCheckInTime: Date) {
+  const checkoutTime = new Date(lastCheckInTime);
+  checkoutTime.setHours(23, 59, 59, 999); // Set to end of the day
+
+  await db.attendance.create({
+    data: {
+      type: "check-out",
+      employee: { connect: { id: employeeId } },
+      timestamp: checkoutTime,
+      reason: "Auto-generated checkout",
+      status: "auto",
+      minutesDifference: 0,
+    },
+  });
+}
+
 export const pinCheck = async (data: any) => {
   const { pin, reason } = data;
   try {
@@ -74,10 +90,25 @@ export const pinCheck = async (data: any) => {
       orderBy: { timestamp: "desc" },
     });
 
-    const type: string =
-      lastRecord?.type === "check-in" ? "check-out" : "check-in";
     const currentTime = new Date();
     currentTime.setHours(currentTime.getHours() + 7);
+
+    let type: string = "check-in";
+
+    if (lastRecord) {
+      const lastRecordDate = new Date(lastRecord.timestamp);
+      const isNewDay =
+        lastRecordDate.getDate() !== currentTime.getDate() ||
+        lastRecordDate.getMonth() !== currentTime.getMonth() ||
+        lastRecordDate.getFullYear() !== currentTime.getFullYear();
+
+      if (isNewDay && lastRecord.type === "check-in") {
+        // Create a checkout record for the previous day
+        await createCheckoutRecord(employee.id, lastRecord.timestamp);
+      } else {
+        type = lastRecord.type === "check-in" ? "check-out" : "check-in";
+      }
+    }
 
     const shift = await db.shift.findFirst({
       where: { id: employee.shift },
