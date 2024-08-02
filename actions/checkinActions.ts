@@ -121,21 +121,22 @@ export const pinCheck = async (data: any) => {
 
     // Create new Date objects with current date but time from shift
     const today = new Date();
-    const shiftStart = new Date(
-      today.setHours(
-        shift.start_time.getHours(),
-        shift.start_time.getMinutes(),
-        0,
-        0
-      )
+    today.setHours(today.getHours() + 7);
+
+    let shiftStart = new Date(today);
+    shiftStart.setHours(
+      shift.start_time.getHours(),
+      shift.start_time.getMinutes(),
+      0,
+      0
     );
-    const shiftEnd = new Date(
-      today.setHours(
-        shift.end_time.getHours(),
-        shift.end_time.getMinutes(),
-        0,
-        0
-      )
+
+    let shiftEnd = new Date(today);
+    shiftEnd.setHours(
+      shift.end_time.getHours(),
+      shift.end_time.getMinutes(),
+      0,
+      0
     );
 
     // Adjust dates for shifts crossing midnight
@@ -144,14 +145,14 @@ export const pinCheck = async (data: any) => {
     }
 
     // Adjust shiftStart if current time is before shift start but after midnight
-    if (
-      currentTime < shiftStart &&
-      currentTime.getHours() < 12 &&
-      shift.start_time.getHours() < 12
-    ) {
-      shiftStart.setDate(shiftStart.getDate() - 1);
-      shiftEnd.setDate(shiftEnd.getDate() - 1);
-    }
+    // if (
+    //   currentTime < shiftStart &&
+    //   currentTime.getHours() < 12 &&
+    //   shift.start_time.getHours() < 12
+    // ) {
+    //   shiftStart.setDate(shiftStart.getDate() - 1);
+    //   shiftEnd.setDate(shiftEnd.getDate() - 1);
+    // }
 
     let status = "on-time";
     let minutesDiff = 0;
@@ -192,6 +193,7 @@ export const pinCheck = async (data: any) => {
     });
 
     revalidatePath("/staff");
+    console.log("Checkin successful", newAttendance);
 
     return { attendance: newAttendance, employee, type };
   } catch (error) {
