@@ -12,7 +12,7 @@ export type ReportColumn = {
 export const columns: ColumnDef<ReportColumn>[] = [
   {
     accessorKey: "date",
-    header: "Date {}",
+    header: "Date",
     cell: ({ row }) => {
       return (
         <span>

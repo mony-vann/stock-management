@@ -30,7 +30,7 @@ export const getReports = async (month: string, year: string) => {
 
   // Create Date objects for the start and end of the month
   const startDate = new Date(yearNumber, monthIndex, 2);
-  const endDate = new Date(yearNumber, monthIndex + 1, 1);
+  const endDate = new Date(yearNumber, monthIndex + 1, 0);
   console.log("Start date", startDate);
   console.log("End date", endDate);
 
