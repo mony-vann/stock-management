@@ -39,11 +39,13 @@ import { Search } from "lucide-react";
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
+  searchBox?: boolean;
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
+  searchBox = true,
 }: // loading = true,
 DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
@@ -67,19 +69,22 @@ DataTableProps<TData, TValue>) {
 
   return (
     <div className="md:w-full">
-      <div className="relative mb-5">
-        <Search className="absolute left-2.5 top-3 h-4 w-4 text-muted-foreground" />
-        <Input
-          type="search"
-          placeholder="Search..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="w-full h-10 rounded-lg bg-background pl-8 md:w-[200px] lg:w-[336px]"
-        />
-      </div>
+      {searchBox && (
+        <div className="relative mb-5">
+          <Search className="absolute left-2.5 top-3 h-4 w-4 text-muted-foreground" />
+          <Input
+            type="search"
+            placeholder="Search..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-full h-10 rounded-lg bg-background pl-8 md:w-[200px] lg:w-[336px]"
+          />
+        </div>
+      )}
+
       <div className="rounded-md border w-full overflow-auto">
         <Table>
-          <TableHeader>
+          <TableHeader className="bg-gray-100">
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => {

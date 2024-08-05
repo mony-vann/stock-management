@@ -16,6 +16,7 @@ export const getAttendanceData = async () => {
           shift: true,
         },
       },
+      id: true,
       timestamp: true,
       type: true,
       status: true,
@@ -35,6 +36,7 @@ export const getAttendanceData = async () => {
   const recentAttendanceLogs = attendanceLogs
     .map((log) => {
       return {
+        id: log.id,
         employeeName: log.employee.name,
         shift: log.employee.shift,
         timestamp: log.timestamp,

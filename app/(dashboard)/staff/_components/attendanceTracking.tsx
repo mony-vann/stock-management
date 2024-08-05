@@ -150,7 +150,7 @@ const AttendanceTracking = ({
                     <TableBody>
                       {logss.map((log: any) => {
                         return (
-                          <TableRow key={log.timestamp}>
+                          <TableRow key={log.id}>
                             <TableCell>
                               <div className="font-medium">
                                 {log.employeeName}

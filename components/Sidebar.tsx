@@ -12,6 +12,7 @@ import {
   LineChart,
   Settings,
   CoffeeIcon,
+  NotepadText,
 } from "lucide-react";
 import {
   TooltipProvider,
@@ -52,7 +53,8 @@ const Sidebar = (props: Props) => {
                     className={`flex h-9 w-9 items-center justify-center rounded-lg transition-colors hover:text-primary md:h-8 md:w-8 ${
                       isLinkActive("/") &&
                       !isLinkActive("/products") &&
-                      !isLinkActive("/staff")
+                      !isLinkActive("/staff") &&
+                      !isLinkActive("/report")
                         ? "bg-primary text-accent hover:text-primary-foreground"
                         : "text-muted-foreground"
                     }`}
@@ -68,18 +70,18 @@ const Sidebar = (props: Props) => {
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Link
-                    href="#"
+                    href="/report"
                     className={`flex h-9 w-9 items-center justify-center rounded-lg transition-colors hover:text-primary md:h-8 md:w-8 ${
-                      isLinkActive(`/orders`)
+                      isLinkActive(`/report`)
                         ? "bg-primary text-accent hover:text-primary-foreground"
                         : "text-muted-foreground"
                     }`}
                   >
-                    <ShoppingCart className="h-5 w-5" />
-                    <span className="sr-only">Orders</span>
+                    <NotepadText className="h-5 w-5" />
+                    <span className="sr-only">Report</span>
                   </Link>
                 </TooltipTrigger>
-                <TooltipContent side="right">Orders</TooltipContent>
+                <TooltipContent side="right">Report</TooltipContent>
               </Tooltip>
             </TooltipProvider>
             <TooltipProvider>

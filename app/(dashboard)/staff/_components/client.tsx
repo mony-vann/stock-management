@@ -7,11 +7,8 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { DataTable } from "@/components/ui/data-table";
-import { Button } from "@/components/ui/button";
 import { StaffColumn, columns } from "./column";
 import AddNewStaff from "./addNewStaff";
-
-import { File } from "lucide-react";
 
 interface StaffClientProps {
   data: StaffColumn[];

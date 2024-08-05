@@ -300,15 +300,29 @@ export const getDifferencesPercentagesFromYesterday = async () => {
 
 export const getDifferencesPercentagesFromLastMonth = async () => {
   const currentDate = new Date();
+  const currentDay = currentDate.getUTCDate() - 1;
   const currentMonthStart = new Date(
     Date.UTC(currentDate.getUTCFullYear(), currentDate.getUTCMonth(), 1)
   );
   const lastMonthStart = new Date(
     Date.UTC(currentDate.getUTCFullYear(), currentDate.getUTCMonth() - 1, 1)
   );
+  const lastMonthEnd = new Date(
+    Date.UTC(
+      currentDate.getUTCFullYear(),
+      currentDate.getUTCMonth() - 1,
+      currentDay
+    )
+  );
 
-  const currentMonthData = await getCurrentMonthSalesReport();
-  const lastMonthData = await getMonthSalesReport(lastMonthStart);
+  const currentMonthData = await getPartialMonthSalesReport(
+    currentMonthStart,
+    currentDate
+  );
+  const lastMonthData = await getPartialMonthSalesReport(
+    lastMonthStart,
+    lastMonthEnd
+  );
 
   if (!currentMonthData || !lastMonthData) {
     const percentages = {
@@ -388,6 +402,56 @@ function calculatePercentage(difference: number, base: number): number {
   }
   return (difference / base) * 100;
 }
+
+// Function to get sales report for a partial month
+export const getPartialMonthSalesReport = async (
+  startDate: Date,
+  endDate: Date
+) => {
+  const summaries = await db.saleSummary.findMany({
+    where: {
+      data: {
+        gte: startDate,
+        lte: endDate,
+      },
+    },
+  });
+
+  if (summaries.length === 0) {
+    return null;
+  }
+
+  const report = summaries.reduce(
+    (acc, curr) => ({
+      totalSales: acc.totalSales + curr.totalSales,
+      totalAmount: acc.totalAmount + curr.totalAmount,
+      totalRevenue: acc.totalRevenue + curr.totalRevenue,
+      totalSubTotal: acc.totalSubTotal + curr.totalSubTotal,
+      totalVAT: acc.totalVAT + curr.totalVAT,
+      totalDiscounts: acc.totalDiscounts + curr.totalDiscounts,
+      averageSaleAmount: 0,
+      largestSale: Math.max(acc.largestSale, curr.largestSale),
+      smallestSale: Math.min(acc.smallestSale, curr.smallestSale),
+      data: curr.data,
+    }),
+    {
+      totalSales: 0,
+      totalAmount: 0,
+      totalRevenue: 0,
+      totalSubTotal: 0,
+      totalVAT: 0,
+      totalDiscounts: 0,
+      averageSaleAmount: 0,
+      largestSale: -Infinity,
+      smallestSale: Infinity,
+      data: new Date(),
+    }
+  );
+
+  report.averageSaleAmount = report.totalAmount / report.totalSales;
+
+  return report;
+};
 
 // Function to get sales report for a specific month
 export const getMonthSalesReport = async (date: Date) => {

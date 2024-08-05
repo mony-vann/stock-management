@@ -59,21 +59,8 @@ export function Dashboard() {
   const [monthlyBottle, setMonthlyBottle] = useState<number | null>(null);
   const [d, setD] = useState<Difference | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [day, setDay] = useState<number>(10);
-  const [dayName, setDayName] = useState<string>("Monday");
   const [month, setMonth] = useState<string>("June");
   const [year, setYear] = useState<number>(2024);
-
-  let daySuffix;
-  if (day === 1 || day === 21 || day === 31) {
-    daySuffix = "st";
-  } else if (day === 2 || day === 22) {
-    daySuffix = "nd";
-  } else if (day === 3 || day === 23) {
-    daySuffix = "rd";
-  } else {
-    daySuffix = "th";
-  }
 
   useEffect(() => {
     const fetchDailySales = async () => {
@@ -83,8 +70,6 @@ export function Dashboard() {
         const differences = await getDifferencesPercentagesFromLastMonth();
         const montlyBottleReport = await getCurrentMonthBottleSaleSummary();
 
-        setDay(response!.data.getDate());
-        setDayName(response!.data.toLocaleString("en-US", { weekday: "long" }));
         setMonth(response!.data.toLocaleString("en-US", { month: "long" }));
         setYear(response!.data.getFullYear());
 
