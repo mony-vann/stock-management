@@ -2,6 +2,7 @@ import BackButton from "./_components/backButton";
 import StaffDetails from "./_components/staffDetails";
 import {
   getAttendanceById,
+  getAttendanceForCurrentMonth,
   getEmployeeById,
   getPayrollById,
   getShifts,
@@ -14,7 +15,7 @@ const StaffDetailPage = async ({
 }) => {
   const payrolls = await getPayrollById(params.staff_id);
   const staff = await getEmployeeById(params.staff_id);
-  const attendance = await getAttendanceById(params.staff_id);
+  const attendance = await getAttendanceForCurrentMonth(params.staff_id);
   const shifts = await getShifts();
   return (
     <div className="flex min-h-screen w-full flex-col bg-muted/40 pt-5 px-4 md:px-10">

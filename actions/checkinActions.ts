@@ -144,16 +144,6 @@ export const pinCheck = async (data: any) => {
       shiftEnd.setDate(shiftEnd.getDate() + 1);
     }
 
-    // Adjust shiftStart if current time is before shift start but after midnight
-    // if (
-    //   currentTime < shiftStart &&
-    //   currentTime.getHours() < 12 &&
-    //   shift.start_time.getHours() < 12
-    // ) {
-    //   shiftStart.setDate(shiftStart.getDate() - 1);
-    //   shiftEnd.setDate(shiftEnd.getDate() - 1);
-    // }
-
     let status = "on-time";
     let minutesDiff = 0;
 

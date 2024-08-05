@@ -79,7 +79,7 @@ const AttendanceTracking = ({
         staffWithMostLates={staffWithMostLatess}
         staffWithMostEarlyLeaves={staffWithMostEarlyLeavess}
       />
-      <div className="lg:grid gap-4 md:gap-4 md:grid-cols-3 xl:grid-cols-5 mt-5">
+      <div className="lg:grid gap-4 md:gap-4 md:grid-cols-3 xl:grid-cols-5 mt-10">
         <div className="xl:col-span-2">
           <Card className="rounded-3xl">
             <CardHeader>

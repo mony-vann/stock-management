@@ -71,6 +71,10 @@ const AttendanceList = ({ attendance, staffId }: any) => {
   ).getDate();
 
   useEffect(() => {
+    updateCheckinsMap([]);
+  }, []);
+
+  useEffect(() => {
     updateCheckinsMap(attendance);
   }, [attendance]);
 
@@ -230,13 +234,23 @@ const AttendanceList = ({ attendance, staffId }: any) => {
                           {checkIn ? (
                             <Badge
                               variant={"outline"}
-                              className="hover:bg-primary pointer-events-none"
+                              className="hover:bg-primary bg-primary text-white pointer-events-none"
                             >
                               Present
                             </Badge>
-                          ) : (
-                            <Badge className=" bg-red-600 hover:bg-red-600 pointer-events-none">
+                          ) : new Date().getDate() > day ? (
+                            <Badge
+                              variant={"outline"}
+                              className="hover:bg-red-600 bg-red-600 text-white pointer-events-none"
+                            >
                               Absent
+                            </Badge>
+                          ) : (
+                            <Badge
+                              variant={"outline"}
+                              className="hover:bg-yellow-400 pointer-events-none"
+                            >
+                              Upcoming
                             </Badge>
                           )}
                         </TableCell>

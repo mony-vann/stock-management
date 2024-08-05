@@ -24,6 +24,17 @@ export const getAttendanceById = (id: string) => {
   });
 };
 
+export const getAttendanceForCurrentMonth = (id: string) => {
+  return db.attendance.findMany({
+    where: {
+      employee_id: id,
+      timestamp: {
+        gte: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
+      },
+    },
+  });
+};
+
 export const getShifts = () => {
   return db.shift.findMany();
 };
