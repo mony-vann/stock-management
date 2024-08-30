@@ -60,7 +60,11 @@ const StaffDetail = ({ payrolls, staff, attendance, shifts }: any) => {
         </CardContent>
       </Card>
       <Payroll payrolls={payrolls} attendance={attendance} staff={staff} />
-      <AttendanceList attendance={attendance} staffId={staff.id} />
+      <AttendanceList
+        attendance={attendance}
+        staffId={staff.id}
+        staff={staff}
+      />
     </div>
   );
 };
