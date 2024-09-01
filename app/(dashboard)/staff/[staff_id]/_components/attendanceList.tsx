@@ -64,13 +64,10 @@ const AttendanceList = ({ attendance, staffId, staff }: any) => {
   const [selectedYear, setSelectedYear] = useState(
     String(new Date().getFullYear())
   );
+  const [monthLength, setMonthLength] = useState(
+    new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).getDate()
+  );
   const [pending, setPending] = useState(false);
-
-  const monthLength = new Date(
-    new Date().getFullYear(),
-    new Date().getMonth() + 1,
-    0
-  ).getDate();
 
   useEffect(() => {
     updateCheckinsMap([]);
@@ -79,6 +76,13 @@ const AttendanceList = ({ attendance, staffId, staff }: any) => {
   useEffect(() => {
     updateCheckinsMap(attendance);
   }, [attendance]);
+
+  useEffect(() => {
+    // Update monthLength when selectedMonth or selectedYear changes
+    const year = parseInt(selectedYear);
+    const month = MONTHS.indexOf(selectedMonth);
+    setMonthLength(new Date(year, month + 1, 0).getDate());
+  }, [selectedMonth, selectedYear]);
 
   const updateCheckinsMap = (logs: any) => {
     const checkins = logs.filter((log: any) => log.type === "check-in");
@@ -109,24 +113,36 @@ const AttendanceList = ({ attendance, staffId, staff }: any) => {
       updateCheckinsMap(response);
       setSelectedMonth(data.month);
       setSelectedYear(data.year);
-      setPending(false);
     } catch (error) {
       console.error("Error fetching attendance:", error);
+    } finally {
+      setPending(false);
     }
   };
 
   const calculateWorkingHours = (checkIn: any, checkOut: any) => {
     if (!checkIn || !checkOut) return "00:00";
+
     const checkInTime = new Date(checkIn.timestamp);
     const checkOutTime = new Date(checkOut.timestamp);
-    const diffInMilliseconds = checkOutTime.getTime() - checkInTime.getTime();
-    const hours = Math.floor(diffInMilliseconds / (1000 * 60 * 60));
-    const minutes = Math.floor(
-      (diffInMilliseconds % (1000 * 60 * 60)) / (1000 * 60)
-    );
-    return `${hours.toString().padStart(2, "0")}:${minutes
-      .toString()
-      .padStart(2, "0")}`;
+
+    // Check if it's an auto clock-out (11:59 PM)
+    const isAutoClockOut =
+      checkOutTime.getHours() === 6 && checkOutTime.getMinutes() === 59;
+
+    if (isAutoClockOut) {
+      // Return 8 hours for auto clock-out
+      return "07:00";
+    } else {
+      const diffInMilliseconds = checkOutTime.getTime() - checkInTime.getTime();
+      const hours = Math.floor(diffInMilliseconds / (1000 * 60 * 60));
+      const minutes = Math.floor(
+        (diffInMilliseconds % (1000 * 60 * 60)) / (1000 * 60)
+      );
+      return `${hours.toString().padStart(2, "0")}:${minutes
+        .toString()
+        .padStart(2, "0")}`;
+    }
   };
 
   const formatDataForExport = () => {
@@ -142,11 +158,7 @@ const AttendanceList = ({ attendance, staffId, staff }: any) => {
           .toString()
           .padStart(2, "0")}-${day.toString().padStart(2, "0")}`;
 
-        const status = checkIn
-          ? "Present"
-          : new Date().getDate() > day
-          ? "Absent"
-          : "Upcoming";
+        const status = getStatus(day, checkIn);
 
         if (status === "Present") totalPresentDays++;
         if (status === "Absent") totalAbsentDays++;
@@ -270,6 +282,23 @@ const AttendanceList = ({ attendance, staffId, staff }: any) => {
     }
   };
 
+  const getStatus = (day: number, checkIn: any) => {
+    const currentDate = new Date();
+    const selectedDate = new Date(
+      parseInt(selectedYear),
+      MONTHS.indexOf(selectedMonth),
+      day
+    );
+
+    if (checkIn) {
+      return "Present";
+    } else if (currentDate > selectedDate) {
+      return "Absent";
+    } else {
+      return "Upcoming";
+    }
+  };
+
   return (
     <Card className="col-span-full rounded-3xl">
       <CardHeader>
@@ -381,6 +410,7 @@ const AttendanceList = ({ attendance, staffId, staff }: any) => {
                   .map((day) => {
                     const checkIn = checkinsMap[day];
                     const checkOut = checkoutsMap[day];
+                    const status = getStatus(day, checkIn);
                     return (
                       <TableRow key={day}>
                         <TableCell>{`${selectedYear}-${(
@@ -391,28 +421,20 @@ const AttendanceList = ({ attendance, staffId, staff }: any) => {
                           .toString()
                           .padStart(2, "0")}`}</TableCell>
                         <TableCell>
-                          {checkIn ? (
-                            <Badge
-                              variant={"outline"}
-                              className="hover:bg-primary bg-primary text-white pointer-events-none"
-                            >
-                              Present
-                            </Badge>
-                          ) : new Date().getDate() > day ? (
-                            <Badge
-                              variant={"outline"}
-                              className="hover:bg-red-600 bg-red-600 text-white pointer-events-none"
-                            >
-                              Absent
-                            </Badge>
-                          ) : (
-                            <Badge
-                              variant={"outline"}
-                              className="hover:bg-yellow-400 pointer-events-none"
-                            >
-                              Upcoming
-                            </Badge>
-                          )}
+                          <Badge
+                            variant={"outline"}
+                            className={`hover:bg-${
+                              status === "Present"
+                                ? "primary bg-primary"
+                                : status === "Absent"
+                                ? "red-600 bg-red-600"
+                                : "yellow-400"
+                            } ${
+                              status !== "Upcoming" ? "text-white" : ""
+                            } pointer-events-none`}
+                          >
+                            {status}
+                          </Badge>
                         </TableCell>
                         <TableCell>
                           {checkIn
@@ -435,29 +457,25 @@ const AttendanceList = ({ attendance, staffId, staff }: any) => {
                             : null}
                         </TableCell>
                         <TableCell>
-                          {checkIn
-                            ? checkIn.status === "late"
-                              ? checkIn.minutesDifference > 60
-                                ? `${Math.floor(
-                                    checkIn.minutesDifference / 60
-                                  )}h ${checkIn.minutesDifference % 60}m`
-                                : `${checkIn.minutesDifference}m`
-                              : "-"
-                            : ""}
+                          {checkIn && checkIn.status === "late"
+                            ? checkIn.minutesDifference > 60
+                              ? `${Math.floor(
+                                  checkIn.minutesDifference / 60
+                                )}h ${checkIn.minutesDifference % 60}m`
+                              : `${checkIn.minutesDifference}m`
+                            : "-"}
                         </TableCell>
                         <TableCell className="w-[250px]">
                           {checkIn ? checkIn.reason : ""}
                         </TableCell>
                         <TableCell>
-                          {checkOut
-                            ? checkOut.status === "early"
-                              ? checkOut.minutesDifference > 60
-                                ? `${Math.floor(
-                                    checkOut.minutesDifference / 60
-                                  )}h ${checkOut.minutesDifference % 60}m`
-                                : `${checkOut.minutesDifference}m`
-                              : "-"
-                            : ""}
+                          {checkOut && checkOut.status === "early"
+                            ? checkOut.minutesDifference > 60
+                              ? `${Math.floor(
+                                  checkOut.minutesDifference / 60
+                                )}h ${checkOut.minutesDifference % 60}m`
+                              : `${checkOut.minutesDifference}m`
+                            : "-"}
                         </TableCell>
                         <TableCell className="w-[250px]">
                           {checkOut ? checkOut.reason : ""}

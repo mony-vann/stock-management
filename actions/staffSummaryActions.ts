@@ -131,18 +131,41 @@ export const getAttendanceByIdAndDate = async (
   month: string,
   year: string
 ) => {
+  // Convert month string to number (assuming month is a string like "January", "February", etc.)
+  const monthIndex = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ].indexOf(month);
+
+  if (monthIndex === -1) {
+    throw new Error("Invalid month provided");
+  }
+
+  // Create Date objects for the start and end of the month
+  const startDate = new Date(parseInt(year), monthIndex, 1);
+  const endDate = new Date(parseInt(year), monthIndex + 1, 1); // This will give us the last day of the month
+
   const attendanceLogs = await db.attendance.findMany({
     where: {
       employee_id,
       timestamp: {
-        gte: new Date(`${year}-${month}-01`),
-        lt: new Date(`${year}-${month}-31`),
+        gte: startDate,
+        lte: endDate,
       },
     },
     orderBy: {
       timestamp: "desc",
     },
   });
-
   return attendanceLogs;
 };
